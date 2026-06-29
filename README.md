@@ -1,7 +1,5 @@
 ﻿# Sistema Academico
 
-Estructura inicial basada en el diagrama UML `ISUML.mdj`.
-
 ## Capas
 
 - `src/presentacion`: controladores de entrada.
