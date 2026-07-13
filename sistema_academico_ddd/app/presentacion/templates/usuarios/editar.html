@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block titulo %}Editar usuario - Sistema Academico{% endblock %}
+
+{% block contenido %}
+<h1>Editar usuario #{{ usuario.id }}</h1>
+
+<form class="formulario-simple" action="{{ url_for('usuario.actualizar', id=usuario.id) }}" method="post">
+    <div>
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" value="{{ usuario.username }}" required>
+    </div>
+    <div>
+        <label for="password">Nueva password (opcional)</label>
+        <input type="password" id="password" name="password" placeholder="Dejar en blanco para no cambiar">
+    </div>
+    <div>
+        <label for="rol">Rol</label>
+        <select id="rol" name="rol">
+            {% for rol in roles %}
+                <option value="{{ rol.value }}" {% if rol == usuario.rol %}selected{% endif %}>{{ rol.value }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit">Guardar cambios</button>
+    <a href="{{ url_for('usuario.listar') }}">Cancelar</a>
+</form>
+{% endblock %}

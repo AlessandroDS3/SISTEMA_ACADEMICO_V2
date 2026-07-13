@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}Sistema Academico{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <span class="marca">Sistema Academico</span>
+        <div class="enlaces">
+            <a href="{{ url_for('home.index') }}">Inicio</a>
+            <a href="{{ url_for('usuario.listar') }}">Usuarios</a>
+            <a href="{{ url_for('examen.listar') }}">Examenes</a>
+            <a href="{{ url_for('respuesta_estudiante.listar') }}">Respuestas</a>
+            <a href="{{ url_for('reporte_institucional.listar') }}">Reportes</a>
+        </div>
+    </nav>
+    <main class="contenido">
+        {% with mensajes = get_flashed_messages() %}
+            {% if mensajes %}
+                {% for mensaje in mensajes %}
+                    <div class="mensaje-flash">{{ mensaje }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block contenido %}{% endblock %}
+    </main>
+</body>
+</html>

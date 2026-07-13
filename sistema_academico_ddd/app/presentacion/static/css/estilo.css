@@ -1,0 +1,139 @@
+:root {
+    --color-primario: #1f4e79;
+    --color-fondo: #f4f6f8;
+    --color-tarjeta: #ffffff;
+    --color-texto: #23272b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: var(--color-fondo);
+    color: var(--color-texto);
+}
+
+.navbar {
+    background: var(--color-primario);
+    color: white;
+    padding: 0.9rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.navbar .marca { font-weight: 700; font-size: 1.2rem; }
+
+.navbar .enlaces a {
+    color: white;
+    text-decoration: none;
+    margin-left: 1.2rem;
+    opacity: 0.9;
+}
+
+.navbar .enlaces a:hover { opacity: 1; text-decoration: underline; }
+
+.contenido {
+    max-width: 960px;
+    margin: 2rem auto;
+    padding: 0 1.2rem;
+}
+
+.bienvenida h1 { color: var(--color-primario); }
+
+.nota-version {
+    display: inline-block;
+    background: #e8eef5;
+    color: var(--color-primario);
+    padding: 0.35rem 0.7rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.tarjeta {
+    background: var(--color-tarjeta);
+    border-radius: 10px;
+    padding: 1.2rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    text-decoration: none;
+    color: var(--color-texto);
+    transition: transform 0.15s ease;
+}
+
+.tarjeta:hover { transform: translateY(-3px); }
+.tarjeta h2 { margin-top: 0; color: var(--color-primario); font-size: 1.1rem; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-tarjeta);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+th, td {
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+th { background: #eef2f6; }
+
+form.formulario-simple {
+    background: var(--color-tarjeta);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    align-items: end;
+}
+
+form.formulario-simple label { display: block; font-size: 0.85rem; margin-bottom: 0.2rem; }
+form.formulario-simple input, form.formulario-simple select {
+    padding: 0.4rem;
+    border: 1px solid #ccd3da;
+    border-radius: 4px;
+}
+
+button {
+    background: var(--color-primario);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover { opacity: 0.9; }
+
+td a {
+    display: inline-block;
+    background: #6c757d;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    margin-right: 0.4rem;
+}
+
+td a:hover { opacity: 0.9; }
+
+td form { display: inline-block; }
+
+.mensaje-flash {
+    background: #fef3cd;
+    border: 1px solid #f0c36d;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}

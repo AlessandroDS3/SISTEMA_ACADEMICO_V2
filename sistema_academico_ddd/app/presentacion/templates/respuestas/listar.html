@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block titulo %}Respuestas - Sistema Academico{% endblock %}
+
+{% block contenido %}
+<h1>Calificacion Automatica de Hojas de Examen</h1>
+
+<form class="formulario-simple" action="{{ url_for('respuesta_estudiante.procesar') }}" method="post" enctype="multipart/form-data">
+    <div>
+        <label for="examen_id">Examen</label>
+        <select id="examen_id" name="examen_id" required>
+            {% for examen in examenes %}
+                <option value="{{ examen.id }}" {% if examen.id == examen_id %}selected{% endif %}>{{ examen.titulo }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label for="estudiante_id">Estudiante</label>
+        <select id="estudiante_id" name="estudiante_id" required>
+            {% for estudiante in estudiantes %}
+                <option value="{{ estudiante.id }}">{{ estudiante.username }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label for="imagen">Imagen de la hoja escaneada</label>
+        <input type="file" id="imagen" name="imagen" accept="image/*" required>
+    </div>
+    <button type="submit">Procesar y calificar</button>
+</form>
+
+<form class="formulario-simple" action="{{ url_for('respuesta_estudiante.listar') }}" method="get">
+    <div>
+        <label for="filtro_examen">Ver respuestas del examen</label>
+        <select id="filtro_examen" name="examen_id" onchange="this.form.submit()">
+            <option value="">-- selecciona --</option>
+            {% for examen in examenes %}
+                <option value="{{ examen.id }}" {% if examen.id == examen_id %}selected{% endif %}>{{ examen.titulo }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</form>
+
+<table>
+    <thead>
+        <tr><th>ID</th><th>Estudiante</th><th>Procesado en</th><th>Nota final</th></tr>
+    </thead>
+    <tbody>
+        {% for respuesta in respuestas %}
+        <tr>
+            <td>{{ respuesta.id }}</td>
+            <td>{{ respuesta.estudiante_id }}</td>
+            <td>{{ respuesta.procesado_en.strftime("%Y-%m-%d %H:%M") if respuesta.procesado_en else "-" }}</td>
+            <td>{{ respuesta.calificacion.nota_final if respuesta.calificacion else "pendiente" }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4">Selecciona un examen para ver sus respuestas procesadas.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

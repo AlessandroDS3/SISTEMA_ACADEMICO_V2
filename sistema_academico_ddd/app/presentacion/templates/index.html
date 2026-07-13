@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block titulo %}Inicio - Sistema Academico{% endblock %}
+
+{% block contenido %}
+<section class="bienvenida">
+    <h1>Bienvenido al Sistema Academico</h1>
+    <p>
+        Plataforma para gestion de examenes, calificacion automatica por
+        vision por computadora (OMR), rankings, seguimiento academico y
+        reportes institucionales.
+    </p>
+    <p class="nota-version">
+        Version inicial (WIP) &mdash; Lab 6/7: arquitectura DDD + Flask + SQLAlchemy.
+    </p>
+
+    <div class="tarjetas">
+        <a class="tarjeta" href="{{ url_for('examen.listar') }}">
+            <h2>Examenes</h2>
+            <p>Crear y administrar examenes y su banco de preguntas.</p>
+        </a>
+        <a class="tarjeta" href="{{ url_for('respuesta_estudiante.listar') }}">
+            <h2>Calificacion Automatica</h2>
+            <p>Procesar hojas de respuesta escaneadas (OMR).</p>
+        </a>
+        <a class="tarjeta" href="{{ url_for('reporte_institucional.listar') }}">
+            <h2>Reportes</h2>
+            <p>Estadisticas institucionales por examen y grupo.</p>
+        </a>
+    </div>
+</section>
+{% endblock %}

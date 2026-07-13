@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}Perfil Academico - Sistema Academico{% endblock %}
+
+{% block contenido %}
+<h1>Perfiles Academicos</h1>
+
+<table>
+    <thead>
+        <tr><th>Estudiante</th><th>Promedio general</th></tr>
+    </thead>
+    <tbody>
+        {% for perfil in perfiles %}
+        <tr>
+            <td>{{ estudiantes.get(perfil.estudiante_id, perfil.estudiante_id) }}</td>
+            <td>{{ "%.2f"|format(perfil.promedio_general) }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="2">Aun no hay perfiles academicos generados.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

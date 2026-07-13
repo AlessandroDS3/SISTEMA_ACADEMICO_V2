@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block titulo %}Reportes - Sistema Academico{% endblock %}
+
+{% block contenido %}
+<h1>Reportes Institucionales</h1>
+
+<form class="formulario-simple" action="{{ url_for('reporte_institucional.generar') }}" method="post">
+    <div>
+        <label for="examen_id">Examen</label>
+        <select id="examen_id" name="examen_id" required>
+            {% for examen in examenes %}
+                <option value="{{ examen.id }}" {% if examen.id == examen_id %}selected{% endif %}>{{ examen.titulo }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit">Generar reporte</button>
+</form>
+
+<table>
+    <thead>
+        <tr><th>ID</th><th>Generado en</th><th>Promedio</th><th>Desviacion estandar</th></tr>
+    </thead>
+    <tbody>
+        {% for reporte in reportes %}
+        <tr>
+            <td>{{ reporte.id }}</td>
+            <td>{{ reporte.generado_en.strftime("%Y-%m-%d %H:%M") if reporte.generado_en else "-" }}</td>
+            <td>{{ "%.2f"|format(reporte.promedio_general) }}</td>
+            <td>{{ "%.2f"|format(reporte.desviacion_estandar) }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4">Selecciona un examen y genera su reporte.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
