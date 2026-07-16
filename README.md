@@ -45,16 +45,18 @@ Organice el repositorio en cuatro capas principales:
 ## Estructura del proyecto
 
 ```txt
-sistema-academico/
+SISTEMA_ACADEMICO_V2/
 ├── docs/
 │   └── uml/
 │       └── ISUML.mdj
-├── src/
-│   ├── presentacion/
-│   ├── aplicacion/
-│   ├── dominio/
-│   └── infraestructura/
-└── tests/
+└── sistema_academico_ddd/     # Implementacion (Python/Flask), ver su propio README
+    ├── app/
+    │   ├── presentacion/
+    │   ├── aplicacion/
+    │   ├── dominio/
+    │   └── infraestructura/
+    ├── migrations/
+    └── tests/
 ```
 
 ## Diagramas UML
@@ -69,4 +71,7 @@ Alli se encuentra el modelo UML con los casos de uso, clases, paquetes y la vist
 
 ## Estado del proyecto
 
-Actualmente el repositorio contiene la estructura inicial del proyecto basada en el diagrama UML. La implementacion del codigo queda pendiente segun el lenguaje de programacion y framework que se elijan.
+La implementacion del sistema (Python, Flask, SQLAlchemy) ya esta en curso dentro
+de [`sistema_academico_ddd/`](sistema_academico_ddd/README.md), que incluye la
+arquitectura DDD en capas, las convenciones de codificacion aplicadas y las
+instrucciones de puesta en marcha y pruebas.

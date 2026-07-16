@@ -3,9 +3,13 @@ import numpy as np
 from math import atan2, degrees, sqrt
 from itertools import combinations
 from skimage import exposure
+import logging
 import os
+import sys
 
-def eliminar_sombras(ruta_imagen, ruta_salida, tamaño_kernel_desenfoque=25, gamma=1.5, ancho_objetivo=1000):
+logger = logging.getLogger(__name__)
+
+def eliminar_sombras(ruta_imagen, ruta_salida, tamano_kernel_desenfoque=25, gamma=1.5, ancho_objetivo=1000):
     """
     Elimina sombras de una imagen para mejorar la detección de esquinas
     """
@@ -21,7 +25,7 @@ def eliminar_sombras(ruta_imagen, ruta_salida, tamaño_kernel_desenfoque=25, gam
     
     # Procesamiento para eliminar sombras
     grises = cv2.cvtColor(img_redimensionada, cv2.COLOR_BGR2GRAY)
-    desenfocado = cv2.GaussianBlur(grises, (tamaño_kernel_desenfoque, tamaño_kernel_desenfoque), 0)
+    desenfocado = cv2.GaussianBlur(grises, (tamano_kernel_desenfoque, tamano_kernel_desenfoque), 0)
     dividido = cv2.divide(grises, desenfocado, scale=255)
     ecualizado = exposure.equalize_adapthist(dividido / 255.0, clip_limit=0.03)
     ecualizado = (ecualizado * 255).astype(np.uint8)
@@ -36,11 +40,11 @@ def eliminar_sombras(ruta_imagen, ruta_salida, tamaño_kernel_desenfoque=25, gam
     cv2.imwrite(ruta_salida, corregido)
     return ruta_salida
 
-def redimensionar_si_grande(imagen, tamaño_maximo=2000):
+def redimensionar_si_grande(imagen, tamano_maximo=2000):
     """Redimensiona la imagen si es muy grande y devuelve el factor de escala"""
     alto, ancho = imagen.shape[:2]
-    if max(alto, ancho) > tamaño_maximo:
-        factor_escala = tamaño_maximo / float(max(alto, ancho))
+    if max(alto, ancho) > tamano_maximo:
+        factor_escala = tamano_maximo / float(max(alto, ancho))
         redimensionada = cv2.resize(imagen, None, fx=factor_escala, fy=factor_escala, interpolation=cv2.INTER_AREA)
         return redimensionada, factor_escala
     return imagen, 1.0
@@ -458,8 +462,8 @@ def detectar_con_respaldo(ruta_imagen, guardar_resultado=True):
         try:
             if os.path.exists(ruta_temporal_sombra):
                 os.remove(ruta_temporal_sombra)
-        except:
-            pass
+        except OSError as error:
+            logger.warning("No se pudo eliminar el archivo temporal %s: %s", ruta_temporal_sombra, error)
     
     # Probar cada configuración: primero imagen original, luego sin sombras
     for configuracion in configuraciones:
@@ -485,11 +489,14 @@ def detectar_con_respaldo(ruta_imagen, guardar_resultado=True):
     limpiar_archivo_temporal()
     return None, None
 
-# Ejemplo de uso
+# Ejemplo de uso: python corner_detector.py <ruta_imagen>
 if __name__ == "__main__":
-    ruta_imagen = "anterior/IMG-20250522-WA0142.jpg"
-    esquinas, imagen_corregida = detectar_con_respaldo(ruta_imagen)
-    
+    if len(sys.argv) < 2:
+        print("Uso: python corner_detector.py <ruta_imagen>")
+        sys.exit(1)
+
+    esquinas, imagen_corregida = detectar_con_respaldo(sys.argv[1])
+
     if esquinas:
         print(f"Detectados {len(esquinas)} cuadrados de esquina")
         for esquina in esquinas:

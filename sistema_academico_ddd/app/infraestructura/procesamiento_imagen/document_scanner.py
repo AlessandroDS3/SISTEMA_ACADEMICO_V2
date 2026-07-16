@@ -1,20 +1,24 @@
 import cv2
 import numpy as np
 from typing import Tuple, Optional, List
-import time
-import os
+import logging
+import sys
+
+logger = logging.getLogger(__name__)
+
+# Umbrales de luminosidad promedio (escala de grises 0-255) usados para
+# clasificar un documento antes de elegir la estrategia de realce de contraste.
+UMBRAL_LUMINOSIDAD_MUY_OSCURA = 120
+UMBRAL_LUMINOSIDAD_OSCURA = 140
+UMBRAL_LUMINOSIDAD_NORMAL = 165
+UMBRAL_LUMINOSIDAD_CLARA = 200
+
 
 class MejoradorDocumentos:
     """
     Clase para mejorar el contraste y saturación de documentos.
     """
-    
-    def __init__(self):
-        """
-        Inicializa el mejorador de documentos.
-        """
-        pass
-    
+
     def mejorar_contraste_documentos(self, imagen: np.ndarray) -> np.ndarray:
         """
         Mejora el contraste de documentos según su luminosidad.
@@ -22,13 +26,13 @@ class MejoradorDocumentos:
         gris = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
         promedio = np.mean(gris.astype(np.float32))
 
-        if promedio <= 120:
+        if promedio <= UMBRAL_LUMINOSIDAD_MUY_OSCURA:
             tipo = "muy_oscura"
-        elif promedio <= 140:
+        elif promedio <= UMBRAL_LUMINOSIDAD_OSCURA:
             tipo = "oscura"
-        elif promedio <= 165:
+        elif promedio <= UMBRAL_LUMINOSIDAD_NORMAL:
             tipo = "normal"
-        elif promedio <= 200:
+        elif promedio <= UMBRAL_LUMINOSIDAD_CLARA:
             tipo = "clara"
         else:
             tipo = "muy_clara"
@@ -305,10 +309,11 @@ class DetectorDocumentosDual:
             imagen_corregida = self.transformacion_cuatro_puntos_alta_resolucion(imagen_original, contorno_original.reshape(4, 2))
             
             return imagen_corregida, True
-            
-        except Exception:
+
+        except Exception as error:
+            logger.warning("Metodo 1 de deteccion de documento fallo: %s", error)
             return imagen_original.copy(), False
-    
+
     def detectar_metodo2_alta_resolucion(self, imagen_original: np.ndarray) -> Tuple[np.ndarray, bool]:
         """
         Método 2: Detección en imagen pequeña, transformación en imagen original.
@@ -342,10 +347,11 @@ class DetectorDocumentosDual:
             corregida = cv2.warpPerspective(imagen_original, matriz_transformacion, (ancho_documento, altura_documento))
             
             return corregida, True
-            
-        except Exception:
+
+        except Exception as error:
+            logger.warning("Metodo 2 de deteccion de documento fallo: %s", error)
             return imagen_original.copy(), False
-    
+
     def detectar_y_corregir_alta_resolucion(self, imagen: np.ndarray, metodo_preferido: int = 1) -> Tuple[np.ndarray, bool]:
         """
         Sistema dual de alta resolución que mantiene calidad original.
@@ -421,10 +427,11 @@ class ProcesadorDocumentos:
             cv2.imwrite(ruta_salida, corregida)
             
             return True
-            
-        except Exception:
+
+        except Exception as error:
+            logger.warning("Fallo al procesar el documento %s: %s", ruta_imagen, error)
             return False
-    
+
     def procesar_documento_desde_array(self, imagen: np.ndarray, ruta_salida: Optional[str] = None, 
                                      metodo_preferido: int = 1) -> Tuple[np.ndarray, bool]:
         """
@@ -453,24 +460,26 @@ class ProcesadorDocumentos:
                 cv2.imwrite(ruta_salida, corregida)
             
             return corregida, exito
-            
-        except Exception:
+
+        except Exception as error:
+            logger.warning("Fallo al procesar la imagen en memoria: %s", error)
             return imagen.copy(), False
 
 
 def main():
     """
     Función principal simplificada - solo maneja entrada y llama a la clase.
+    Uso: python document_scanner.py <ruta_imagen>
     """
-    # Configurar ruta de imagen
-    ruta_imagen = "Captura de pantalla 2025-07-07 050759.png"
-    
-    # Crear procesador
+    if len(sys.argv) < 2:
+        print("Uso: python document_scanner.py <ruta_imagen>")
+        return
+
+    ruta_imagen = sys.argv[1]
+
     procesador = ProcesadorDocumentos()
-    
-    # Procesar documento
     exito = procesador.procesar_documento(ruta_imagen)
-    
+
     if not exito:
         print("El procesamiento falló")
 

@@ -13,7 +13,7 @@ from typing import Dict, List, Tuple
 from app.infraestructura.procesamiento_imagen.document_scanner import ProcesadorDocumentos
 from app.infraestructura.procesamiento_imagen.corner_detector import detectar_con_respaldo
 from app.infraestructura.procesamiento_imagen.orientacion import corregir_orientacion_por_bordes
-from app.infraestructura.procesamiento_imagen.identificacion import process_answer_sheet
+from app.infraestructura.procesamiento_imagen.identificacion import procesar_hoja_respuestas
 from app.infraestructura.procesamiento_imagen.hoja_respuestas import ProcesadorExamenOMR
 
 
@@ -35,7 +35,7 @@ class ProcesadorImagenServicio:
     def identificar_estudiante(self, ruta_imagen_corregida: str) -> Tuple[List[int], str]:
         """Extrae el codigo del estudiante (burbujas de DNI/codigo) y el
         area de aplicacion marcada en la hoja."""
-        return process_answer_sheet(ruta_imagen_corregida)
+        return procesar_hoja_respuestas(ruta_imagen_corregida)
 
     def extraer_respuestas_marcadas(self, ruta_imagen_corregida: str) -> Dict[str, str]:
         """Detecta las alternativas marcadas (A/B/C/D) pregunta por
