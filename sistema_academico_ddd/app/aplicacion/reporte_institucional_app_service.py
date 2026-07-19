@@ -1,6 +1,5 @@
 """Application Service: casos de uso de Reportes_y_Estadisticas
 (generar reporte institucional consolidado de un Examen)."""
-import statistics
 from typing import List, Optional
 
 from app.extensions import db
@@ -31,19 +30,30 @@ class ReporteInstitucionalAppService:
         self._examen_repositorio = examen_repositorio
 
     def generar_reporte(self, examen_id: int) -> ReporteInstitucional:
-        """Caso de uso: 'Generar reporte institucional de un examen'."""
+        """Caso de uso: 'Generar reporte institucional de un examen'.
+
+        Estilo Cookbook: el caso de uso se lee como una receta de pasos
+        con nombre propio; cada paso esta extraido en su propio metodo y
+        el cuerpo describe *que* se hace, no *como*.
+        """
         self._validar_examen_existe(examen_id)
+        reporte = self._construir_reporte_con_estadisticas(examen_id)
+        self._registrar_estadisticas_por_grupo(reporte, examen_id)
+        return self._persistir_reporte(reporte)
 
-        respuestas = self._respuesta_repositorio.buscar_por_examen(examen_id)
-        notas = [r.calificacion.nota_final for r in respuestas if r.calificacion is not None]
-
-        promedio = statistics.mean(notas) if notas else 0.0
-        desviacion = statistics.pstdev(notas) if len(notas) > 1 else 0.0
-
-        reporte = ReporteInstitucional(
+    def _construir_reporte_con_estadisticas(self, examen_id: int) -> ReporteInstitucional:
+        """Paso 2 de la receta: pedir al repositorio el promedio y la
+        desviacion ya agregados en SQL (estilo Persistent-Tables)."""
+        promedio, desviacion = self._reporte_repositorio.estadisticas_nota_por_examen(examen_id)
+        return ReporteInstitucional(
             examen_id=examen_id, promedio_general=promedio, desviacion_estandar=desviacion
         )
 
+    def _registrar_estadisticas_por_grupo(
+        self, reporte: ReporteInstitucional, examen_id: int
+    ) -> None:
+        """Paso 3 de la receta: delegar en la entidad el registro de una
+        estadistica por cada grupo asignado al examen (estilo Things)."""
         aprobados, desaprobados = self._respuesta_repositorio.contar_por_umbral_nota(
             examen_id, NOTA_MINIMA_APROBATORIA
         )
@@ -51,11 +61,13 @@ class ReporteInstitucionalAppService:
         for asignacion in asignaciones:
             reporte.registrar_estadistica_grupo(
                 asignacion_grupo_id=asignacion.id,
-                promedio_grupo=promedio,
+                promedio_grupo=reporte.promedio_general,
                 numero_aprobados=aprobados,
                 numero_desaprobados=desaprobados,
             )
 
+    def _persistir_reporte(self, reporte: ReporteInstitucional) -> ReporteInstitucional:
+        """Paso 4 de la receta: persistir el agregado ya construido."""
         return self._reporte_repositorio.guardar(reporte)
 
     def _validar_examen_existe(self, examen_id: int) -> None:

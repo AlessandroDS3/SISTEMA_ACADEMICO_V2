@@ -1,6 +1,6 @@
 """Interfaz de repositorio del dominio (UMLInterface IReporteInstitucionalRepositorio)."""
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from app.dominio.reportes_estadisticas.reporte_institucional import ReporteInstitucional
 
@@ -17,6 +17,11 @@ class IReporteInstitucionalRepositorio(ABC):
 
     @abstractmethod
     def buscar_por_examen(self, examen_id: int) -> List[ReporteInstitucional]:
+        ...
+
+    @abstractmethod
+    def estadisticas_nota_por_examen(self, examen_id: int) -> Tuple[float, float]:
+        """Devuelve (promedio, desviacion_estandar) de las notas del examen."""
         ...
 
     @abstractmethod

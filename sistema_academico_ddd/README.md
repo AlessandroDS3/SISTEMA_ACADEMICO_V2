@@ -407,6 +407,38 @@ def registrar_estadistica_grupo(self, asignacion_grupo_id, promedio_grupo,
 exista reutilizando `ExamenNoEncontradoError`
 ([reporte_institucional_app_service.py](app/aplicacion/reporte_institucional_app_service.py)).
 
+**Cookbook** — `generar_reporte` se lee como una receta: cada paso esta
+extraido en su propio metodo con nombre propio, y el cuerpo describe
+*que* se hace, no *como*:
+
+```python
+def generar_reporte(self, examen_id: int) -> ReporteInstitucional:
+    self._validar_examen_existe(examen_id)
+    reporte = self._construir_reporte_con_estadisticas(examen_id)
+    self._registrar_estadisticas_por_grupo(reporte, examen_id)
+    return self._persistir_reporte(reporte)
+```
+
+**Persistent-Tables** — el promedio y la desviacion estandar del reporte
+se calculan con agregaciones `AVG` en SQL en vez de traer todas las notas
+a memoria y recorrerlas con `statistics`; la desviacion poblacional se
+deriva de dos promedios pedidos en la misma consulta
+([reporte_institucional_repositorio_impl.py](app/infraestructura/repositorios/reporte_institucional_repositorio_impl.py)):
+
+```python
+promedio_nota, promedio_cuadrados = (
+    db.session.query(
+        func.avg(Calificacion.nota_final),
+        func.avg(Calificacion.nota_final * Calificacion.nota_final),
+    )
+    .join(RespuestaEstudiante, Calificacion.respuesta_id == RespuestaEstudiante.id)
+    .filter(RespuestaEstudiante.examen_id == examen_id)
+    .one()
+)
+varianza = float(promedio_cuadrados) - promedio * promedio
+return promedio, math.sqrt(max(varianza, 0.0))
+```
+
 ### 5. `seguimiento_academico`
 
 **Cookbook** — `registrar_resultado_examen` como receta de pasos
