@@ -42,18 +42,19 @@ class PerfilAcademicoAppService:
     def registrar_resultado_examen(
         self, estudiante_id: int, examen_id: int, nota_final: float
     ) -> PerfilAcademico:
-        """Caso de uso: 'Actualizar seguimiento academico tras un
-        examen'. Estilo Cookbook: se lee como una receta de pasos con
-        nombre propio; el paso de recalculo delega en el trio Trinity
-        (Estado/Lector/Escritor) de `evolucion_academica.py`."""
+        """Caso de uso: 'Actualizar seguimiento academico tras un examen'.
+
+        Estilo Cookbook: se lee como una receta de pasos con nombre
+        propio; el recalculo delega en el trio Trinity
+        (Estado/Lector/Escritor) de `evolucion_academica.py`.
+
+        ADVERTENCIA: el orden de los dos ultimos pasos importa. Hay que
+        recalcular el promedio ANTES de registrar la evolucion nueva,
+        porque el autoflush de SQLAlchemy adelantaria el INSERT al leer
+        la relacion y la nota quedaria contada dos veces.
+        """
         self._validar_nota(nota_final)
         perfil = self.obtener_o_crear_perfil(estudiante_id)
-        # El promedio se recalcula ANTES de registrar la evolucion nueva:
-        # el Lector lee el historial tal cual esta en la base de datos
-        # (sin la nota nueva todavia) y la agrega el una sola vez. Si se
-        # hiciera al reves, el autoflush de SQLAlchemy adelantaria el
-        # INSERT de la evolucion nueva al leer la relacion y la nota
-        # quedaria contada dos veces.
         self._recalcular_promedio_general(perfil, nota_final)
         self._registrar_evolucion(perfil, examen_id, nota_final)
         db.session.commit()
@@ -63,8 +64,12 @@ class PerfilAcademicoAppService:
         if not (NOTA_MINIMA <= nota_final <= NOTA_MAXIMA):
             raise NotaInvalidaError(nota_final)
 
-    def _registrar_evolucion(self, perfil: PerfilAcademico, examen_id: int, nota_final: float) -> None:
-        evolucion = EvolucionNota(perfil_id=perfil.id, examen_id=examen_id, nota_final=nota_final)
+    def _registrar_evolucion(
+        self, perfil: PerfilAcademico, examen_id: int, nota_final: float
+    ) -> None:
+        evolucion = EvolucionNota(
+            perfil_id=perfil.id, examen_id=examen_id, nota_final=nota_final
+        )
         db.session.add(evolucion)
 
     def _recalcular_promedio_general(self, perfil: PerfilAcademico, nota_nueva: float) -> None:

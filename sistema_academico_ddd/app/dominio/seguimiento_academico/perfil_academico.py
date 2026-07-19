@@ -4,7 +4,7 @@ Seguimiento_Academico): historial academico consolidado de un estudiante.
 from typing import Optional
 
 from app.extensions import db
-from app.dominio.seguimiento_academico.desglose_por_area import DesgloseporArea
+from app.dominio.seguimiento_academico.desglose_por_area import DesglosePorArea
 
 
 class PerfilAcademico(db.Model):
@@ -15,13 +15,13 @@ class PerfilAcademico(db.Model):
     promedio_general = db.Column(db.Float, nullable=False, default=0.0)
 
     desgloses_por_area = db.relationship(
-        "DesgloseporArea", back_populates="perfil", cascade="all, delete-orphan"
+        "DesglosePorArea", back_populates="perfil", cascade="all, delete-orphan"
     )
     evoluciones_nota = db.relationship(
         "EvolucionNota", back_populates="perfil", cascade="all, delete-orphan"
     )
 
-    def desglose_de_area(self, area_id: int) -> Optional[DesgloseporArea]:
+    def desglose_de_area(self, area_id: int) -> Optional[DesglosePorArea]:
         """Estilo Things: el propio PerfilAcademico sabe buscar dentro
         de su coleccion de desgloses, en vez de que cada llamador
         repita el `next((d for d in perfil.desgloses_por_area if ...))`
@@ -29,4 +29,7 @@ class PerfilAcademico(db.Model):
         return next((d for d in self.desgloses_por_area if d.area_id == area_id), None)
 
     def __repr__(self) -> str:
-        return f"<PerfilAcademico estudiante_id={self.estudiante_id} promedio={self.promedio_general}>"
+        return (
+            f"<PerfilAcademico estudiante_id={self.estudiante_id} "
+            f"promedio={self.promedio_general}>"
+        )

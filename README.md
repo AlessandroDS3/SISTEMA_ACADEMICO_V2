@@ -138,6 +138,25 @@ Handling, Persistent-Tables, Lazy-Rivers, Trinity y Restful**.
 Detalle con fragmentos de codigo por estilo en
 **[`sistema_academico_ddd/README.md`](sistema_academico_ddd/README.md#estilos-de-codificación)**.
 
+## Practicas Clean Code
+
+Sobre las convenciones y los estilos se aplicaron ademas **practicas de
+codificacion legible** (*Clean Code*, R. C. Martin), al menos una por cada
+categoria:
+
+| Categoria | Practica aplicada |
+|---|---|
+| Nombres | Distinciones significativas y PascalCase consistente (`DesglosePorArea`) |
+| Funciones | Pequeñas y con un solo nivel de abstraccion |
+| Comentarios | Comentario como advertencia de consecuencias, no como ruido |
+| Estructura del codigo | Lineas cortas (< 100 caracteres) |
+| Objetos y datos | Ley de Demeter: la presentacion no accede a SQLAlchemy |
+| Tratamiento de errores | Excepciones con contexto en vez de codigos de error |
+| Clases | Responsabilidad unica y alta cohesion |
+
+Detalle con fragmentos antes/despues en
+**[`sistema_academico_ddd/README.md`](sistema_academico_ddd/README.md#practicas-clean-code)**.
+
 ## Tablero de Gestion (Trello)
 
 Tablero Kanban/Scrum con la plantilla **User Story Mapping**:

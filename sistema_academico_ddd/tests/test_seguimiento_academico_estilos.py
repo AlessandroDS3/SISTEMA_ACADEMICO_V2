@@ -12,9 +12,12 @@ from app.infraestructura.repositorios.perfil_academico_repositorio_impl import (
 from app.infraestructura.repositorios.respuesta_estudiante_repositorio_impl import (
     RespuestaEstudianteRepositorioImpl,
 )
-from app.dominio.seguimiento_academico.excepciones import NotaInvalidaError
+from app.dominio.seguimiento_academico.excepciones import (
+    NotaInvalidaError,
+    PerfilNoEncontradoError,
+)
 from app.dominio.seguimiento_academico.perfil_academico import PerfilAcademico
-from app.dominio.seguimiento_academico.desglose_por_area import DesgloseporArea
+from app.dominio.seguimiento_academico.desglose_por_area import DesglosePorArea
 
 
 @pytest.fixture()
@@ -39,8 +42,17 @@ def test_registrar_resultado_examen_con_nota_fuera_de_rango_lanza_excepcion_de_d
 
 def test_desglose_de_area_encuentra_el_desglose_correspondiente():
     perfil = PerfilAcademico(estudiante_id=1)
-    desglose = DesgloseporArea(area_id=5, promedio_area=14.0)
+    desglose = DesglosePorArea(area_id=5, promedio_area=14.0)
     perfil.desgloses_por_area.append(desglose)
 
     assert perfil.desglose_de_area(5) is desglose
     assert perfil.desglose_de_area(999) is None
+
+
+def test_eliminar_perfil_inexistente_lanza_excepcion_en_vez_de_codigo_de_error(app):
+    """Clean Code (Tratamiento de Errores): el repositorio lanza una
+    excepcion con contexto en vez de devolver `False`."""
+    repositorio = PerfilAcademicoRepositorioImpl()
+
+    with pytest.raises(PerfilNoEncontradoError):
+        repositorio.eliminar(9999)

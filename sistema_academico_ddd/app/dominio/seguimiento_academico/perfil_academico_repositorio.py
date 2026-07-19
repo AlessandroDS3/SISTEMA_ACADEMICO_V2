@@ -24,7 +24,12 @@ class IPerfilAcademicoRepositorio(ABC):
         ...
 
     @abstractmethod
-    def eliminar(self, perfil_id: int) -> bool:
+    def eliminar(self, perfil_id: int) -> None:
+        """Elimina el perfil indicado.
+
+        Lanza `PerfilNoEncontradoError` si no existe, en vez de devolver
+        un codigo de error booleano.
+        """
         ...
 
     @abstractmethod

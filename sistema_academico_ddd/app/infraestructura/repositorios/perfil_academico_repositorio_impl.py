@@ -2,6 +2,7 @@
 from typing import List, Optional
 
 from app.extensions import db
+from app.dominio.seguimiento_academico.excepciones import PerfilNoEncontradoError
 from app.dominio.seguimiento_academico.perfil_academico import PerfilAcademico
 from app.dominio.seguimiento_academico.perfil_academico_repositorio import (
     IPerfilAcademicoRepositorio,
@@ -25,13 +26,12 @@ class PerfilAcademicoRepositorioImpl(IPerfilAcademicoRepositorio):
         db.session.commit()
         return perfil
 
-    def eliminar(self, perfil_id: int) -> bool:
+    def eliminar(self, perfil_id: int) -> None:
         perfil = self.buscar_por_id(perfil_id)
         if perfil is None:
-            return False
+            raise PerfilNoEncontradoError(perfil_id)
         db.session.delete(perfil)
         db.session.commit()
-        return True
 
     def listar(self) -> List[PerfilAcademico]:
         return db.session.query(PerfilAcademico).all()

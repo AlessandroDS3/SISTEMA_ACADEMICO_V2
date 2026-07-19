@@ -550,6 +550,126 @@ temprano en la fachada en vez de dejar que el error aparezca varios
 niveles adentro como una excepción genérica de OpenCV/NumPy
 ([excepciones.py](app/infraestructura/procesamiento_imagen/excepciones.py)).
 
+## Practicas Clean Code
+
+Trabajo individual (Lab 11): se aplico **al menos una practica por cada
+una de las 7 categorias** de *Clean Code* (R. C. Martin) sobre el
+subdominio `seguimiento_academico`. Suite completa en verde (49 pruebas)
+y `pyflakes` sin hallazgos.
+
+### 1. Nombres — usar distinciones significativas y consistentes
+
+La entidad se llamaba `DesgloseporArea`, rompiendo el PascalCase del
+resto del dominio. Renombrada en sus 9 referencias:
+
+```python
+# Antes
+class DesgloseporArea(db.Model):
+
+# Despues
+class DesglosePorArea(db.Model):
+```
+
+### 2. Funciones — pequeñas y con un solo nivel de abstraccion
+
+La vista mezclaba obtener perfiles, consultar usuarios y renderizar. El
+detalle de bajo nivel se extrajo a una funcion con nombre propio
+([perfil_academico_controller.py](app/presentacion/perfil_academico_controller.py)):
+
+```python
+@perfil_academico_bp.route("/", methods=["GET"])
+def listar():
+    perfiles = perfil_academico_app_service().listar_perfiles()
+    return render_template(
+        "perfil_academico/listar.html",
+        perfiles=perfiles,
+        estudiantes=_nombres_de_estudiantes(),
+    )
+```
+
+### 3. Comentarios — usarlos como advertencia de consecuencias
+
+Un bloque de 6 lineas de comentario inline se traslado al docstring del
+caso de uso, dejando el cuerpo limpio y conservando la advertencia (que
+si es un uso valido de comentario)
+([perfil_academico_app_service.py](app/aplicacion/perfil_academico_app_service.py)):
+
+```python
+"""Caso de uso: 'Actualizar seguimiento academico tras un examen'.
+
+ADVERTENCIA: el orden de los dos ultimos pasos importa. Hay que
+recalcular el promedio ANTES de registrar la evolucion nueva,
+porque el autoflush de SQLAlchemy adelantaria el INSERT al leer
+la relacion y la nota quedaria contada dos veces.
+"""
+```
+
+### 4. Estructura del codigo fuente — mantener las lineas cortas
+
+Se dividieron las 3 lineas que superaban los 100 caracteres:
+
+```python
+def _registrar_evolucion(
+    self, perfil: PerfilAcademico, examen_id: int, nota_final: float
+) -> None:
+    evolucion = EvolucionNota(
+        perfil_id=perfil.id, examen_id=examen_id, nota_final=nota_final
+    )
+```
+
+### 5. Objetos y estructuras de datos — Ley de Demeter
+
+El controller consultaba SQLAlchemy directamente y conocia la entidad
+`Usuario` de otro subdominio. Ahora solo habla con su servicio:
+
+```python
+# Antes: la presentacion hablaba con la base de datos
+estudiantes = {u.id: u.username for u in db.session.query(Usuario).all()}
+
+# Despues: pide el dato al servicio que le corresponde
+def _nombres_de_estudiantes() -> Dict[int, str]:
+    usuarios = usuario_app_service().listar_usuarios()
+    return {usuario.id: usuario.username for usuario in usuarios}
+```
+
+### 6. Tratamiento de errores — preferir excepciones a codigos de error
+
+`eliminar()` devolvia `False` (codigo de error) cuando el perfil no
+existia, obligando a cada llamador a comprobar el retorno y ocultando la
+causa. Ahora lanza una excepcion de dominio con contexto:
+
+```python
+# Antes
+def eliminar(self, perfil_id: int) -> bool:
+    perfil = self.buscar_por_id(perfil_id)
+    if perfil is None:
+        return False
+    ...
+    return True
+
+# Despues
+def eliminar(self, perfil_id: int) -> None:
+    perfil = self.buscar_por_id(perfil_id)
+    if perfil is None:
+        raise PerfilNoEncontradoError(perfil_id)
+    db.session.delete(perfil)
+    db.session.commit()
+```
+
+### 7. Clases — responsabilidad unica y cohesion
+
+`PerfilNoEncontradoError` es una clase pequeña con una unica razon de
+cambio, y el controller dejo de cargar con la responsabilidad de
+consultar usuarios (que pertenece a `UsuarioAppService`)
+([excepciones.py](app/dominio/seguimiento_academico/excepciones.py)):
+
+```python
+class PerfilNoEncontradoError(SeguimientoAcademicoError):
+    def __init__(self, perfil_id: int):
+        super().__init__(f"No existe un perfil academico con id {perfil_id}")
+        self.perfil_id = perfil_id
+```
+
 ## Tablero Kanban / Scrum
 
 El tablero de seguimiento del proyecto (User Story Mapping) está en Trello: *https://trello.com/b/HcmsG7VW*. Organizado en 8 listas por actividad (backbone del mapa) — Autenticación y Usuarios, Gestión de Exámenes, Banco de Preguntas, Calificación Automática, Rankings, Seguimiento Académico, Reportes y Estadísticas, No Funcionales — con las tarjetas de cada lista ordenadas por prioridad (MVP / Release 2 / Release 3) y etiquetadas por rol.
