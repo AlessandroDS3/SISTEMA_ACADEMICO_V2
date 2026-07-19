@@ -176,9 +176,11 @@ Resumen de convenciones aplicadas:
 
 El seguimiento del proyecto se lleva en un tablero de Trello basado en la
 plantilla **User Story Mapping** (historias por rol + flujo Product Backlog /
-Sprint Backlog / Kanban). El detalle esta documentado en:
+Sprint Backlog / Kanban).
 
-**[`docs/trello/TABLERO_KANBAN.md`](docs/trello/TABLERO_KANBAN.md)**
+**Tablero:** https://trello.com/invite/b/6a01f35ff286ed0f23f5fc1a/ATTIb6448387dde7723fca198a76b17a29ff6EEE3DEB/sistema-academico
+
+Detalle documentado en **[`docs/trello/TABLERO_KANBAN.md`](docs/trello/TABLERO_KANBAN.md)**.
 
 ## Puesta en marcha y pruebas
 

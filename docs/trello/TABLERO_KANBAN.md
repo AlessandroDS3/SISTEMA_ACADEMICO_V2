@@ -3,7 +3,7 @@
 Tablero de gestion del proyecto basado en la plantilla **User Story Mapping**
 en Trello, tal como pide la Practica 9.
 
-> **Enlace al tablero:** _(pegar aqui la URL publica del tablero de Trello)_
+> **Enlace al tablero:** https://trello.com/invite/b/6a01f35ff286ed0f23f5fc1a/ATTIb6448387dde7723fca198a76b17a29ff6EEE3DEB/sistema-academico
 
 El tablero combina dos vistas: el **mapa de historias por rol** (parte superior,
 que agrupa las historias segun el actor que las ejecuta) y el **flujo Kanban/Scrum**
