@@ -1,6 +1,6 @@
 """Controller de presentacion: PerfilAcademico (subdominio
 Seguimiento_Academico)."""
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template
 
 from app.contenedor import perfil_academico_app_service
 from app.extensions import db

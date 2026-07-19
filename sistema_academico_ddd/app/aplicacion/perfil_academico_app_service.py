@@ -1,6 +1,6 @@
 """Application Service: casos de uso de Seguimiento_Academico (consultar
 y actualizar el perfil academico consolidado de un estudiante)."""
-from typing import List, Optional
+from typing import List
 
 from app.extensions import db
 from app.dominio.seguimiento_academico.perfil_academico import PerfilAcademico
@@ -8,9 +8,18 @@ from app.dominio.seguimiento_academico.perfil_academico_repositorio import (
     IPerfilAcademicoRepositorio,
 )
 from app.dominio.seguimiento_academico.evolucion_nota import EvolucionNota
+from app.dominio.seguimiento_academico.excepciones import NotaInvalidaError
+from app.dominio.seguimiento_academico.evolucion_academica import (
+    EvolucionAcademicaEstado,
+    EvolucionAcademicaLector,
+    EvolucionAcademicaEscritor,
+)
 from app.dominio.calificacion_automatica.respuesta_estudiante_repositorio import (
     IRespuestaEstudianteRepositorio,
 )
+
+NOTA_MINIMA = 0.0
+NOTA_MAXIMA = 20.0
 
 
 class PerfilAcademicoAppService:
@@ -30,18 +39,38 @@ class PerfilAcademicoAppService:
             perfil = self._perfil_repositorio.guardar(perfil)
         return perfil
 
-    def registrar_resultado_examen(self, estudiante_id: int, examen_id: int, nota_final: float) -> PerfilAcademico:
-        """Caso de uso: 'Actualizar seguimiento academico tras un examen'."""
+    def registrar_resultado_examen(
+        self, estudiante_id: int, examen_id: int, nota_final: float
+    ) -> PerfilAcademico:
+        """Caso de uso: 'Actualizar seguimiento academico tras un
+        examen'. Estilo Cookbook: se lee como una receta de pasos con
+        nombre propio; el paso de recalculo delega en el trio Trinity
+        (Estado/Lector/Escritor) de `evolucion_academica.py`."""
+        self._validar_nota(nota_final)
         perfil = self.obtener_o_crear_perfil(estudiante_id)
+        # El promedio se recalcula ANTES de registrar la evolucion nueva:
+        # el Lector lee el historial tal cual esta en la base de datos
+        # (sin la nota nueva todavia) y la agrega el una sola vez. Si se
+        # hiciera al reves, el autoflush de SQLAlchemy adelantaria el
+        # INSERT de la evolucion nueva al leer la relacion y la nota
+        # quedaria contada dos veces.
+        self._recalcular_promedio_general(perfil, nota_final)
+        self._registrar_evolucion(perfil, examen_id, nota_final)
+        db.session.commit()
+        return perfil
 
+    def _validar_nota(self, nota_final: float) -> None:
+        if not (NOTA_MINIMA <= nota_final <= NOTA_MAXIMA):
+            raise NotaInvalidaError(nota_final)
+
+    def _registrar_evolucion(self, perfil: PerfilAcademico, examen_id: int, nota_final: float) -> None:
         evolucion = EvolucionNota(perfil_id=perfil.id, examen_id=examen_id, nota_final=nota_final)
         db.session.add(evolucion)
 
-        notas = [e.nota_final for e in perfil.evoluciones_nota] + [nota_final]
-        perfil.promedio_general = sum(notas) / len(notas)
-
-        db.session.commit()
-        return perfil
+    def _recalcular_promedio_general(self, perfil: PerfilAcademico, nota_nueva: float) -> None:
+        estado = EvolucionAcademicaEstado(perfil, nota_nueva)
+        notas = EvolucionAcademicaLector.notas_historicas(estado)
+        EvolucionAcademicaEscritor.aplicar_nuevo_promedio(estado, notas)
 
     def listar_perfiles(self) -> List[PerfilAcademico]:
         return self._perfil_repositorio.listar()

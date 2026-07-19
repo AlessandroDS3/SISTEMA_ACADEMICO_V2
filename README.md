@@ -118,6 +118,26 @@ El proyecto sigue [PEP 8](https://peps.python.org/pep-0008/), reforzado con
 Detalle con fragmentos antes/despues en
 **[`sistema_academico_ddd/README.md`](sistema_academico_ddd/README.md#convenciones-de-codificación-práctica--fragmento-de-código)**.
 
+## Estilos de Codificacion
+
+Ademas de las convenciones, se aplicaron **estilos de programacion** (basados en
+*Exercises in Programming Style*, C. Lopes) en cada subdominio: al menos 4 por
+componente. Estilos usados: **Cookbook, Pipeline, Things, Error/Exception
+Handling, Persistent-Tables, Lazy-Rivers, Trinity y Restful**.
+
+| Componente | Estilos aplicados |
+|---|---|
+| `autenticacion_usuarios` | Error/Exception Handling, Things, Persistent-Tables, Lazy-Rivers |
+| `gestion_examenes` | Cookbook, Error/Exception Handling, Things, Persistent-Tables |
+| `calificacion_automatica` | Pipeline, Things, Error/Exception Handling, Persistent-Tables |
+| `rankings` + `reportes_estadisticas` | Persistent-Tables, Lazy-Rivers, Things, Error/Exception Handling |
+| `seguimiento_academico` | Cookbook, Trinity, Error/Exception Handling, Things |
+| `presentacion` (controllers) | Restful, Things, Cookbook, Error/Exception Handling |
+| `procesamiento_imagen` (OMR) | Pipeline, Things, Cookbook, Error/Exception Handling |
+
+Detalle con fragmentos de codigo por estilo en
+**[`sistema_academico_ddd/README.md`](sistema_academico_ddd/README.md#estilos-de-codificación)**.
+
 ## Tablero de Gestion (Trello)
 
 Tablero Kanban/Scrum con la plantilla **User Story Mapping**:

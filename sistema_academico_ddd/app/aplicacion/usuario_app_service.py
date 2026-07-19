@@ -5,6 +5,10 @@ from typing import List, Optional
 from app.dominio.autenticacion_usuarios.usuario import Usuario
 from app.dominio.autenticacion_usuarios.rol_enum import RolEnum
 from app.dominio.autenticacion_usuarios.usuario_repositorio import IUsuarioRepositorio
+from app.dominio.autenticacion_usuarios.excepciones import (
+    UsernameEnUsoError,
+    UsuarioNoEncontradoError,
+)
 
 
 class UsuarioAppService:
@@ -17,7 +21,7 @@ class UsuarioAppService:
 
     def registrar_usuario(self, username: str, password: str, rol: RolEnum) -> Usuario:
         if self._repositorio.buscar_por_username(username) is not None:
-            raise ValueError(f"El username '{username}' ya esta en uso")
+            raise UsernameEnUsoError(username)
 
         usuario = Usuario(username=username, rol=rol)
         usuario.establecer_password(password)
@@ -40,14 +44,13 @@ class UsuarioAppService:
     ) -> Usuario:
         usuario = self._repositorio.buscar_por_id(id)
         if usuario is None:
-            raise ValueError(f"No existe un usuario con id {id}")
+            raise UsuarioNoEncontradoError(id)
 
         existente = self._repositorio.buscar_por_username(username)
         if existente is not None and existente.id != id:
-            raise ValueError(f"El username '{username}' ya esta en uso")
+            raise UsernameEnUsoError(username)
 
-        usuario.username = username
-        usuario.rol = rol
+        usuario.actualizar_perfil(username, rol)
         if password:
             usuario.establecer_password(password)
         return self._repositorio.actualizar(usuario)

@@ -6,8 +6,13 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 
 from app.contenedor import usuario_app_service
 from app.dominio.autenticacion_usuarios.rol_enum import RolEnum
+from app.presentacion.decoradores import manejar_errores_de_dominio
 
 usuario_bp = Blueprint("usuario", __name__)
+
+
+def _ir_al_listado(*_args, **_kwargs):
+    return redirect(url_for("usuario.listar"))
 
 
 @usuario_bp.route("/", methods=["GET"])
@@ -18,17 +23,15 @@ def listar():
 
 
 @usuario_bp.route("/nuevo", methods=["POST"])
+@manejar_errores_de_dominio(_ir_al_listado)
 def crear():
     servicio = usuario_app_service()
-    try:
-        servicio.registrar_usuario(
-            username=request.form["username"],
-            password=request.form["password"],
-            rol=RolEnum(request.form.get("rol", RolEnum.ESTUDIANTE.value)),
-        )
-        flash("Usuario creado correctamente")
-    except ValueError as error:
-        flash(str(error))
+    servicio.registrar_usuario(
+        username=request.form["username"],
+        password=request.form["password"],
+        rol=RolEnum(request.form.get("rol", RolEnum.ESTUDIANTE.value)),
+    )
+    flash("Usuario creado correctamente")
     return redirect(url_for("usuario.listar"))
 
 
@@ -43,18 +46,16 @@ def editar(id: int):
 
 
 @usuario_bp.route("/<int:id>/editar", methods=["POST"])
+@manejar_errores_de_dominio(_ir_al_listado)
 def actualizar(id: int):
     servicio = usuario_app_service()
-    try:
-        servicio.actualizar_usuario(
-            id=id,
-            username=request.form["username"],
-            rol=RolEnum(request.form.get("rol", RolEnum.ESTUDIANTE.value)),
-            password=request.form.get("password") or None,
-        )
-        flash("Usuario actualizado correctamente")
-    except ValueError as error:
-        flash(str(error))
+    servicio.actualizar_usuario(
+        id=id,
+        username=request.form["username"],
+        rol=RolEnum(request.form.get("rol", RolEnum.ESTUDIANTE.value)),
+        password=request.form.get("password") or None,
+    )
+    flash("Usuario actualizado correctamente")
     return redirect(url_for("usuario.listar"))
 
 

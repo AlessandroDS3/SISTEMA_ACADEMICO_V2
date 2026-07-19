@@ -30,3 +30,10 @@ class IExamenRepositorio(ABC):
     @abstractmethod
     def listar(self) -> List[Examen]:
         ...
+
+    @abstractmethod
+    def contar_preguntas_por_examen(self, examen_id: int) -> int:
+        """Estilo Persistent-Tables: conteo agregado en la base de
+        datos en vez de `len(examen.preguntas)` sobre la coleccion ya
+        cargada en memoria."""
+        ...

@@ -44,6 +44,7 @@ def _registrar_blueprints(app: Flask) -> None:
     from app.presentacion.respuesta_estudiante_controller import respuesta_estudiante_bp
     from app.presentacion.perfil_academico_controller import perfil_academico_bp
     from app.presentacion.reporte_institucional_controller import reporte_institucional_bp
+    from app.presentacion.api_usuario_controller import api_usuario_bp
 
     app.register_blueprint(home_bp)
     app.register_blueprint(usuario_bp, url_prefix="/usuarios")
@@ -51,3 +52,4 @@ def _registrar_blueprints(app: Flask) -> None:
     app.register_blueprint(respuesta_estudiante_bp, url_prefix="/respuestas")
     app.register_blueprint(perfil_academico_bp, url_prefix="/perfil-academico")
     app.register_blueprint(reporte_institucional_bp, url_prefix="/reportes")
+    app.register_blueprint(api_usuario_bp, url_prefix="/api/usuarios")

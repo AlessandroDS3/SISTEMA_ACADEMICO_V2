@@ -6,9 +6,10 @@ al patron Repository de DDD: el dominio depende de la abstraccion,
 no de SQLAlchemy directamente.
 """
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import Dict, Iterator, List, Optional
 
 from app.dominio.autenticacion_usuarios.usuario import Usuario
+from app.dominio.autenticacion_usuarios.rol_enum import RolEnum
 
 
 class IUsuarioRepositorio(ABC):
@@ -35,4 +36,14 @@ class IUsuarioRepositorio(ABC):
 
     @abstractmethod
     def listar(self) -> List[Usuario]:
+        ...
+
+    @abstractmethod
+    def contar_por_rol(self) -> Dict[RolEnum, int]:
+        """Estilo Persistent-Tables: un conteo agregado por rol."""
+        ...
+
+    @abstractmethod
+    def iterar_todos(self) -> Iterator[Usuario]:
+        """Estilo Lazy-Rivers: recorre la tabla de forma perezosa."""
         ...

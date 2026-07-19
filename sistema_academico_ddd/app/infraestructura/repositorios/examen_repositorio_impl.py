@@ -1,8 +1,11 @@
 """Implementacion concreta de IExamenRepositorio usando SQLAlchemy."""
 from typing import List, Optional
 
+from sqlalchemy import func
+
 from app.extensions import db
 from app.dominio.gestion_examenes.examen import Examen
+from app.dominio.gestion_examenes.pregunta_banco import PreguntaBanco
 from app.dominio.gestion_examenes.examen_repositorio import IExamenRepositorio
 
 
@@ -33,3 +36,11 @@ class ExamenRepositorioImpl(IExamenRepositorio):
 
     def listar(self) -> List[Examen]:
         return db.session.query(Examen).all()
+
+    def contar_preguntas_por_examen(self, examen_id: int) -> int:
+        return (
+            db.session.query(func.count(PreguntaBanco.id))
+            .filter(PreguntaBanco.examen_id == examen_id)
+            .scalar()
+            or 0
+        )

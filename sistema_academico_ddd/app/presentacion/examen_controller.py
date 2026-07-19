@@ -5,8 +5,13 @@ from app.contenedor import examen_app_service
 from app.extensions import db
 from app.dominio.area_materia.materia import Materia
 from app.dominio.autenticacion_usuarios.usuario import Usuario
+from app.presentacion.decoradores import manejar_errores_de_dominio
 
 examen_bp = Blueprint("examen", __name__)
+
+
+def _ir_al_listado(*_args, **_kwargs):
+    return redirect(url_for("examen.listar"))
 
 
 @examen_bp.route("/", methods=["GET"])
@@ -47,20 +52,18 @@ def editar(id: int):
 
 
 @examen_bp.route("/<int:id>/editar", methods=["POST"])
+@manejar_errores_de_dominio(_ir_al_listado)
 def actualizar(id: int):
     servicio = examen_app_service()
-    try:
-        servicio.actualizar_examen(
-            id=id,
-            titulo=request.form["titulo"],
-            materia_id=int(request.form["materia_id"]),
-            numero_preguntas=int(request.form["numero_preguntas"]),
-            numero_alternativas=int(request.form.get("numero_alternativas", 4)),
-            puntaje_por_pregunta=float(request.form.get("puntaje_por_pregunta", 1.0)),
-        )
-        flash("Examen actualizado correctamente")
-    except ValueError as error:
-        flash(str(error))
+    servicio.actualizar_examen(
+        id=id,
+        titulo=request.form["titulo"],
+        materia_id=int(request.form["materia_id"]),
+        numero_preguntas=int(request.form["numero_preguntas"]),
+        numero_alternativas=int(request.form.get("numero_alternativas", 4)),
+        puntaje_por_pregunta=float(request.form.get("puntaje_por_pregunta", 1.0)),
+    )
+    flash("Examen actualizado correctamente")
     return redirect(url_for("examen.listar"))
 
 

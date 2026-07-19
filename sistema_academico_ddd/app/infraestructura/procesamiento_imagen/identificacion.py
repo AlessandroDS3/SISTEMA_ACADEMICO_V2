@@ -1,183 +1,186 @@
 import cv2
 import numpy as np
-import logging
 from typing import Tuple, List
 
-logger = logging.getLogger(__name__)
-
-def cargar_y_preprocesar_imagen(ruta_imagen: str) -> np.ndarray:
+def load_and_preprocess_image(image_path: str) -> np.ndarray:
     """
-    Carga y preprocesa la imagen de la hoja de respuestas.
-
+    Load and preprocess the answer sheet image.
+    
     Args:
-        ruta_imagen: Ruta al archivo de imagen
-
+        image_path: Path to the image file
+        
     Returns:
-        Imagen binaria preprocesada
+        Preprocessed binary image
     """
-    img = cv2.imread(ruta_imagen)
+    # Read the image
+    img = cv2.imread(image_path)
     if img is None:
-        raise FileNotFoundError(f"No se pudo abrir o encontrar la imagen: {ruta_imagen}")
-
-    # Convertir a escala de grises
-    gris = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    # Aplicar umbral para obtener imagen binaria
-    _, binaria = cv2.threshold(gris, 120, 255, cv2.THRESH_BINARY_INV)
-
-    # Aplicar operaciones morfológicas para resaltar las marcas
+        raise FileNotFoundError(f"Could not open or find the image: {image_path}")
+    
+    # Convert to grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    # Apply threshold to get binary image
+    _, binary = cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY_INV)
+    
+    # Apply morphological operations to enhance marks
     kernel = np.ones((2,2), np.uint8)
-    binaria = cv2.morphologyEx(binaria, cv2.MORPH_CLOSE, kernel)
+    binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
+    
+    return binary
 
-    return binaria
-
-def extraer_seccion_identificacion(imagen_binaria: np.ndarray) -> np.ndarray:
+def extract_id_section(binary_image: np.ndarray) -> np.ndarray:
     """
-    Extrae la sección de identificación de la hoja de respuestas.
-
+    Extract the identification section from the answer sheet.
+    
     Args:
-        imagen_binaria: Imagen binaria de la hoja de respuestas
-
+        binary_image: Binary image of the answer sheet
+        
     Returns:
-        La sección de identificación de la imagen
+        The identification section of the image
     """
-    alto, ancho = imagen_binaria.shape
+    height, width = binary_image.shape
+    
+    # Extract the left quarter of the image (ID section)
+    id_section = binary_image[:, :width//4]
+    
+    return id_section
 
-    # Extrae el cuarto izquierdo de la imagen (sección de identificación)
-    seccion_id = imagen_binaria[:, :ancho//4]
-
-    return seccion_id
-
-def detectar_burbujas_llenas_dni(seccion_id: np.ndarray) -> List[int]:
+def detect_filled_bubbles_in_dni(id_section: np.ndarray) -> List[int]:
     """
-    Detecta qué burbujas están marcadas en la sección de DNI.
-
+    Detect which bubbles are filled in the DNI section.
+    
     Args:
-        seccion_id: La sección de identificación de la hoja de respuestas
-
+        id_section: The identification section of the answer sheet
+        
     Returns:
-        Lista de dígitos de DNI detectados
+        List of detected DNI digits
     """
-    alto, ancho = seccion_id.shape
+    height, width = id_section.shape
 
-    # Región del DNI definida a partir de las proporciones de la hoja de referencia
-    dni_inicio_y = int(alto * 0.37)
-    dni_fin_y = int(alto * 0.673)
-    dni_inicio_x = int(ancho * 0.14)
-    dni_fin_x = int(ancho * 0.81)
+    # Define the DNI region based on the provided image
+    dni_region_start_y = int(height * 0.37)
+    dni_region_end_y = int(height * 0.673)
+    dni_region_start_x = int(width * 0.14)
+    dni_region_end_x = int(width * 0.81)
 
-    region_dni = seccion_id[dni_inicio_y:dni_fin_y, dni_inicio_x:dni_fin_x]
+    dni_region = id_section[dni_region_start_y:dni_region_end_y, dni_region_start_x:dni_region_end_x]
 
-    alto_dni, ancho_dni = region_dni.shape
-    num_digitos = 8
-    alto_celda_digito = alto_dni // 10
-    ancho_posicion_digito = ancho_dni // num_digitos
+    dni_height, dni_width = dni_region.shape
+    num_digits = 8
+    digit_cell_height = dni_height // 10
+    digit_position_width = dni_width // num_digits
+    start_offset = 0
 
-    dni_detectado = []
+    detected_dni = []
 
-    for posicion_digito in range(num_digitos):
-        inicio_x = posicion_digito * ancho_posicion_digito
-        fin_x = inicio_x + ancho_posicion_digito
-        columna_digito = region_dni[:, inicio_x:fin_x]
+    for digit_pos in range(num_digits):
+        start_x = start_offset + digit_pos * digit_position_width
+        end_x = start_x + digit_position_width
+        digit_column = dni_region[:, start_x:end_x]
 
-        valor_max_llenado = -1
-        conteo_max_llenado = 0
+        max_filled_value = -1
+        max_filled_count = 0
 
-        for valor in range(10):
-            inicio_y = valor * alto_celda_digito
-            fin_y = inicio_y + alto_celda_digito
+        for value in range(10):
+            start_y = value * digit_cell_height
+            end_y = start_y + digit_cell_height
 
-            region_burbuja = columna_digito[inicio_y:fin_y, :]
-            conteo_llenado = np.sum(region_burbuja) // 255
+            bubble_region = digit_column[start_y:end_y, :]
+            filled_count = np.sum(bubble_region) // 255
 
-            if conteo_llenado > conteo_max_llenado:
-                conteo_max_llenado = conteo_llenado
-                valor_max_llenado = valor
+            if filled_count > max_filled_count:
+                max_filled_count = filled_count
+                max_filled_value = value
 
-        dni_detectado.append(valor_max_llenado)
+        detected_dni.append(max_filled_value)
 
-    return dni_detectado
+    return detected_dni
 
-def detectar_area_postulacion(seccion_id: np.ndarray) -> str:
+def detect_application_area(id_section: np.ndarray) -> str:
     """
-    Detecta a qué área está postulando el estudiante.
-
+    Detect which area the student is applying to.
+    
     Args:
-        seccion_id: La sección de identificación de la hoja de respuestas
-
+        id_section: The identification section of the answer sheet
+        
     Returns:
-        El área de postulación detectada (Ingenierías, Biomédicas o Sociales)
+        The detected application area (Ingenierías, Biomédicas, or Sociales)
     """
-    alto, ancho = seccion_id.shape
-
-    area_inicio_y = int(alto * 0.19)
-    area_fin_y = int(alto * 0.23)
-    area_inicio_x = int(ancho * 0.645)
-    area_fin_x = int(ancho * 0.864)
-
-    if area_fin_y >= alto:
-        area_fin_y = alto - 1
-    if area_fin_x >= ancho:
-        area_fin_x = ancho - 1
-
-    region_area = seccion_id[area_inicio_y:area_fin_y, area_inicio_x:area_fin_x]
-
-    _, ancho_area = region_area.shape
-    tercio_ancho_area = ancho_area // 3
+    height, width = id_section.shape
+    
+    area_region_start_y = int(height * 0.19)
+    area_region_end_y = int(height * 0.23)
+    area_region_start_x = int(width * 0.645)
+    area_region_end_x = int(width * 0.864)
+    
+    if area_region_end_y >= height:
+        area_region_end_y = height - 1
+    if area_region_end_x >= width:
+        area_region_end_x = width - 1
+    
+    area_region = id_section[area_region_start_y:area_region_end_y, 
+                            area_region_start_x:area_region_end_x]
+    
+    area_height, area_width = area_region.shape
+    area_width_third = area_width // 3
     areas = [1, 2, 3]
-    conteos_llenado_area = []
-
-    conteo_max_llenado = 0
-    indice_area_seleccionada = 0
-
+    area_filled_counts = []
+    
+    max_filled_count = 0
+    selected_area_index = 0
+    
     for i in range(3):
-        inicio_x = i * tercio_ancho_area
-        fin_x = inicio_x + tercio_ancho_area
-        region_burbuja = region_area[:, inicio_x:fin_x]
-        conteo_llenado = np.sum(region_burbuja) // 255
-        conteos_llenado_area.append(conteo_llenado)
-
-        if conteo_llenado > conteo_max_llenado:
-            conteo_max_llenado = conteo_llenado
-            indice_area_seleccionada = i
-
-    if sum(conteos_llenado_area) < 10:
+        start_x = i * area_width_third
+        end_x = start_x + area_width_third
+        bubble_region = area_region[:, start_x:end_x]
+        filled_count = np.sum(bubble_region) // 255
+        area_filled_counts.append(filled_count)
+        
+        if filled_count > max_filled_count:
+            max_filled_count = filled_count
+            selected_area_index = i
+    
+    if sum(area_filled_counts) < 10:
         return " "
+    
+    return str(areas[selected_area_index])
 
-    return str(areas[indice_area_seleccionada])
-
-def procesar_hoja_respuestas(ruta_imagen: str) -> Tuple[List[int], str]:
+def process_answer_sheet(image_path: str) -> Tuple[List[int], str]:
     """
-    Procesa la imagen de la hoja de respuestas para extraer la identificación del estudiante.
-
+    Process the answer sheet image to extract student identification information.
+    
     Args:
-        ruta_imagen: Ruta a la imagen de la hoja de respuestas
-
+        image_path: Path to the answer sheet image
+        
     Returns:
-        Tupla (dígitos del DNI, área de postulación)
+        Tuple of (DNI digits, application area)
     """
     try:
-        imagen_binaria = cargar_y_preprocesar_imagen(ruta_imagen)
-        seccion_id = extraer_seccion_identificacion(imagen_binaria)
-
-        dni = detectar_burbujas_llenas_dni(seccion_id)
-        area = detectar_area_postulacion(seccion_id)
-
+        # Load and preprocess the image
+        binary_image = load_and_preprocess_image(image_path)
+        
+        # Extract identification section
+        id_section = extract_id_section(binary_image)
+        
+        # Detect DNI
+        dni = detect_filled_bubbles_in_dni(id_section)
+        
+        # Detect application area
+        area = detect_application_area(id_section)
+        
         return dni, area
-
-    except Exception as error:
-        logger.warning("Error al procesar la hoja de respuestas %s: %s", ruta_imagen, error)
+        
+    except Exception as e:
+        print(f"Error processing answer sheet: {str(e)}")
         return [], ""
 
 if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) < 2:
-        print("Uso: python identificacion.py <ruta_imagen>")
-        sys.exit(1)
-
-    dni, area = procesar_hoja_respuestas(sys.argv[1])
-    dni_final = ''.join(map(str, dni))
-
-    print(f"DNI: {dni_final}")
+    # Replace this with the path to your answer sheet image
+    image_path = "documento_final.jpg"
+    
+    dni, area = process_answer_sheet(image_path)
+    final_dni = ''.join(map(str, dni))
+    
+    print(f"DNI: {final_dni}")
     print(f"Area: {area}")

@@ -5,6 +5,8 @@ from datetime import datetime
 
 from app.extensions import db
 from app.dominio.area_materia.materia import Materia  # noqa: F401 (relacion)
+from app.dominio.gestion_examenes.excepciones import PreguntaDuplicadaError
+from app.dominio.gestion_examenes.pregunta_banco import PreguntaBanco
 
 
 class Examen(db.Model):
@@ -30,6 +32,16 @@ class Examen(db.Model):
         uselist=False,
         cascade="all, delete-orphan",
     )
+
+    def agregar_pregunta(self, pregunta: PreguntaBanco) -> None:
+        """Estilo Things: el Examen es quien conoce y protege el
+        invariante "no dos preguntas con el mismo numero en el banco",
+        en vez de que la capa de aplicacion construya el objeto y lo
+        anexe a `self.preguntas` sin validar nada."""
+        if any(p.numero_pregunta == pregunta.numero_pregunta for p in self.preguntas):
+            raise PreguntaDuplicadaError(pregunta.numero_pregunta)
+        pregunta.examen = self
+        self.preguntas.append(pregunta)
 
     def __repr__(self) -> str:
         return f"<Examen id={self.id} titulo={self.titulo!r}>"

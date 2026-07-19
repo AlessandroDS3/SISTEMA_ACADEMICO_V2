@@ -30,14 +30,11 @@ class CalificacionServicio:
             else:
                 incorrectas += 1
 
-        puntaje = correctas * configuracion.puntaje_por_pregunta
-        puntaje -= incorrectas * configuracion.penalizacion_por_error
-        nota_final = max(puntaje, 0.0)
-
-        return Calificacion(
+        return Calificacion.calcular(
             respuesta_id=respuesta.id,
             numero_correctas=correctas,
             numero_incorrectas=incorrectas,
             numero_en_blanco=en_blanco,
-            nota_final=nota_final,
+            puntaje_por_pregunta=configuracion.puntaje_por_pregunta,
+            penalizacion_por_error=configuracion.penalizacion_por_error,
         )
