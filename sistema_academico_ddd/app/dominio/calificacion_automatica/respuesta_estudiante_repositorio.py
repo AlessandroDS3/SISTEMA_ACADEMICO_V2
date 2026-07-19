@@ -45,5 +45,7 @@ class IRespuestaEstudianteRepositorio(ABC):
         ...
 
     @abstractmethod
-    def contar_por_umbral_nota(self, examen_id: int, nota_minima_aprobatoria: float) -> Tuple[int, int]:
+    def contar_por_umbral_nota(
+        self, examen_id: int, nota_minima_aprobatoria: float
+    ) -> Tuple[int, int]:
         ...

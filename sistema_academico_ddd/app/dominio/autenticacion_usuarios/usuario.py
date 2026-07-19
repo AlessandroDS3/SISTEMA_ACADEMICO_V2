@@ -1,10 +1,10 @@
 """Entidad de dominio Usuario (raiz de agregado del subdominio
 Autenticacion_y_Usuarios).
 """
-from datetime import datetime
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from app.dominio.tiempo import ahora_utc
 from app.extensions import db
 from app.dominio.autenticacion_usuarios.rol_enum import RolEnum
 from app.dominio.autenticacion_usuarios.excepciones import PasswordInvalidoError
@@ -17,7 +17,7 @@ class Usuario(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
     rol = db.Column(db.Enum(RolEnum), nullable=False, default=RolEnum.ESTUDIANTE)
-    creado_en = db.Column(db.DateTime, default=datetime.utcnow)
+    creado_en = db.Column(db.DateTime, default=ahora_utc)
 
     credenciales = db.relationship(
         "Credencial", back_populates="usuario", cascade="all, delete-orphan"

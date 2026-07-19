@@ -670,6 +670,31 @@ class PerfilNoEncontradoError(SeguimientoAcademicoError):
         self.perfil_id = perfil_id
 ```
 
+### Mejoras Clean Code a nivel de proyecto
+
+Ademas del subdominio asignado, se corrigieron los hallazgos de analisis
+estatico que afectaban a todo el proyecto:
+
+- **API deprecada** (`datetime.utcnow()`, 7 usos): reemplazada por el
+  helper `app/dominio/tiempo.py::ahora_utc()`, que usa la API vigente
+  (`datetime.now(timezone.utc)`) conservando el formato naive-UTC de las
+  columnas ya persistidas. Con esto la suite pasa de 63 warnings de
+  deprecacion a **0 warnings**.
+
+```python
+def ahora_utc() -> datetime:
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+```
+
+- **Separacion de capas en toda la presentacion**: `examen_controller` y
+  `respuesta_estudiante_controller` tambien consultaban SQLAlchemy
+  directamente; ahora piden los catalogos a sus servicios
+  (`ExamenAppService.listar_materias()`,
+  `UsuarioAppService.listar_usuarios()`). Ningun controller del proyecto
+  importa `db`.
+- **Formato**: ninguna linea supera los 100 caracteres fuera del modulo
+  OMR heredado.
+
 ## Tablero Kanban / Scrum
 
 El tablero de seguimiento del proyecto (User Story Mapping) está en Trello: *https://trello.com/b/HcmsG7VW*. Organizado en 8 listas por actividad (backbone del mapa) — Autenticación y Usuarios, Gestión de Exámenes, Banco de Preguntas, Calificación Automática, Rankings, Seguimiento Académico, Reportes y Estadísticas, No Funcionales — con las tarjetas de cada lista ordenadas por prioridad (MVP / Release 2 / Release 3) y etiquetadas por rol.

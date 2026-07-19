@@ -54,7 +54,9 @@ class RespuestaEstudianteRepositorioImpl(IRespuestaEstudianteRepositorio):
         )
         return float(promedio) if promedio is not None else 0.0
 
-    def contar_por_umbral_nota(self, examen_id: int, nota_minima_aprobatoria: float) -> Tuple[int, int]:
+    def contar_por_umbral_nota(
+        self, examen_id: int, nota_minima_aprobatoria: float
+    ) -> Tuple[int, int]:
         """Estilo Persistent-Tables: dos `COUNT` filtrados por umbral,
         en vez de cargar todas las notas y contarlas con `sum(1 for ...)`
         en Python."""

@@ -1,10 +1,7 @@
 """Controller de presentacion: Examen (subdominio Gestion_de_Examenes)."""
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 
-from app.contenedor import examen_app_service
-from app.extensions import db
-from app.dominio.area_materia.materia import Materia
-from app.dominio.autenticacion_usuarios.usuario import Usuario
+from app.contenedor import examen_app_service, usuario_app_service
 from app.presentacion.decoradores import manejar_errores_de_dominio
 
 examen_bp = Blueprint("examen", __name__)
@@ -18,8 +15,8 @@ def _ir_al_listado(*_args, **_kwargs):
 def listar():
     servicio = examen_app_service()
     examenes = servicio.listar_examenes()
-    materias = db.session.query(Materia).all()
-    docentes = db.session.query(Usuario).all()
+    materias = servicio.listar_materias()
+    docentes = usuario_app_service().listar_usuarios()
     return render_template(
         "examenes/listar.html", examenes=examenes, materias=materias, docentes=docentes
     )
@@ -47,7 +44,7 @@ def editar(examen_id: int):
     if examen is None:
         flash("Examen no encontrado")
         return redirect(url_for("examen.listar"))
-    materias = db.session.query(Materia).all()
+    materias = servicio.listar_materias()
     return render_template("examenes/editar.html", examen=examen, materias=materias)
 
 

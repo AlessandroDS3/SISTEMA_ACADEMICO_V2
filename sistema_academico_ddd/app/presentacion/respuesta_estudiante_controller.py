@@ -6,9 +6,11 @@ import uuid
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 
-from app.contenedor import respuesta_estudiante_app_service, examen_app_service
-from app.extensions import db
-from app.dominio.autenticacion_usuarios.usuario import Usuario
+from app.contenedor import (
+    examen_app_service,
+    respuesta_estudiante_app_service,
+    usuario_app_service,
+)
 
 respuesta_estudiante_bp = Blueprint("respuesta_estudiante", __name__)
 
@@ -19,7 +21,7 @@ def listar():
     examen_id = request.args.get("examen_id", type=int)
     respuestas = servicio.listar_por_examen(examen_id) if examen_id else []
     examenes = examen_app_service().listar_examenes()
-    estudiantes = db.session.query(Usuario).all()
+    estudiantes = usuario_app_service().listar_usuarios()
     return render_template(
         "respuestas/listar.html",
         respuestas=respuestas,

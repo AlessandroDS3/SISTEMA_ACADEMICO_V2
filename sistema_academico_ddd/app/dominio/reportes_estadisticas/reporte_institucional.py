@@ -1,7 +1,7 @@
 """Entidad de dominio ReporteInstitucional (raiz de agregado del
 subdominio Reportes_y_Estadisticas)."""
-from datetime import datetime
 
+from app.dominio.tiempo import ahora_utc
 from app.extensions import db
 from app.dominio.reportes_estadisticas.estadistica_grupal import EstadisticaGrupal
 
@@ -11,7 +11,7 @@ class ReporteInstitucional(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     examen_id = db.Column(db.Integer, db.ForeignKey("examenes.id"), nullable=False)
-    generado_en = db.Column(db.DateTime, default=datetime.utcnow)
+    generado_en = db.Column(db.DateTime, default=ahora_utc)
     promedio_general = db.Column(db.Float, nullable=False, default=0.0)
     desviacion_estandar = db.Column(db.Float, nullable=False, default=0.0)
 

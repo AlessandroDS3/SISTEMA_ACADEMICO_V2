@@ -1,7 +1,8 @@
 """Entidad de dominio Credencial (token de sesion asociado a un Usuario)."""
-from datetime import datetime, timedelta
+from datetime import timedelta
 import secrets
 
+from app.dominio.tiempo import ahora_utc
 from app.extensions import db
 
 
@@ -20,8 +21,8 @@ class Credencial(db.Model):
         return Credencial(
             usuario_id=usuario_id,
             token_sesion=secrets.token_hex(32),
-            expira_en=datetime.utcnow() + timedelta(hours=horas_validez),
+            expira_en=ahora_utc() + timedelta(hours=horas_validez),
         )
 
     def esta_vigente(self) -> bool:
-        return datetime.utcnow() < self.expira_en
+        return ahora_utc() < self.expira_en

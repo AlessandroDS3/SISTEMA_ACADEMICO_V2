@@ -1,8 +1,8 @@
 """Entidad de dominio Examen (raiz de agregado del subdominio
 Gestion_de_Examenes).
 """
-from datetime import datetime
 
+from app.dominio.tiempo import ahora_utc
 from app.extensions import db
 from app.dominio.gestion_examenes.excepciones import PreguntaDuplicadaError
 from app.dominio.gestion_examenes.pregunta_banco import PreguntaBanco
@@ -15,7 +15,7 @@ class Examen(db.Model):
     titulo = db.Column(db.String(150), nullable=False)
     materia_id = db.Column(db.Integer, db.ForeignKey("materias.id"), nullable=False)
     creado_por_id = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=False)
-    creado_en = db.Column(db.DateTime, default=datetime.utcnow)
+    creado_en = db.Column(db.DateTime, default=ahora_utc)
     numero_preguntas = db.Column(db.Integer, nullable=False, default=0)
 
     materia = db.relationship("Materia")

@@ -2,6 +2,7 @@
 configuracion, banco de preguntas, asignacion a grupos)."""
 from typing import List, Optional
 
+from app.dominio.area_materia.materia import Materia
 from app.dominio.gestion_examenes.examen import Examen
 from app.dominio.gestion_examenes.examen_factory import ExamenFactory
 from app.dominio.gestion_examenes.examen_repositorio import IExamenRepositorio
@@ -90,7 +91,9 @@ class ExamenAppService:
         return pregunta
 
     def asignar_grupo(self, examen_id: int, nombre_grupo: str, docente_id: int) -> AsignacionGrupo:
-        asignacion = AsignacionGrupo(examen_id=examen_id, nombre_grupo=nombre_grupo, docente_id=docente_id)
+        asignacion = AsignacionGrupo(
+            examen_id=examen_id, nombre_grupo=nombre_grupo, docente_id=docente_id
+        )
         db.session.add(asignacion)
         db.session.commit()
         return asignacion
@@ -103,6 +106,14 @@ class ExamenAppService:
 
     def listar_examenes(self) -> List[Examen]:
         return self._repositorio.listar()
+
+    def listar_materias(self) -> List[Materia]:
+        """Catalogo de materias para los formularios de examen.
+
+        Evita que la capa de presentacion consulte SQLAlchemy
+        directamente (Ley de Demeter / separacion de capas).
+        """
+        return db.session.query(Materia).all()
 
     def actualizar_examen(
         self,
