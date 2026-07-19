@@ -79,8 +79,8 @@ class ReporteInstitucionalAppService:
         if self._examen_repositorio.buscar_por_id(examen_id) is None:
             raise ExamenNoEncontradoError(examen_id)
 
-    def obtener_por_id(self, id: int) -> Optional[ReporteInstitucional]:
-        return self._reporte_repositorio.buscar_por_id(id)
+    def obtener_por_id(self, reporte_id: int) -> Optional[ReporteInstitucional]:
+        return self._reporte_repositorio.buscar_por_id(reporte_id)
 
     def listar_por_examen(self, examen_id: int) -> List[ReporteInstitucional]:
         return self._reporte_repositorio.buscar_por_examen(examen_id)

@@ -20,8 +20,8 @@ class ReporteInstitucionalRepositorioImpl(IReporteInstitucionalRepositorio):
         db.session.commit()
         return reporte
 
-    def buscar_por_id(self, id: int) -> Optional[ReporteInstitucional]:
-        return db.session.get(ReporteInstitucional, id)
+    def buscar_por_id(self, reporte_id: int) -> Optional[ReporteInstitucional]:
+        return db.session.get(ReporteInstitucional, reporte_id)
 
     def buscar_por_examen(self, examen_id: int) -> List[ReporteInstitucional]:
         return db.session.query(ReporteInstitucional).filter_by(examen_id=examen_id).all()
@@ -56,8 +56,8 @@ class ReporteInstitucionalRepositorioImpl(IReporteInstitucionalRepositorio):
         db.session.commit()
         return reporte
 
-    def eliminar(self, id: int) -> bool:
-        reporte = self.buscar_por_id(id)
+    def eliminar(self, reporte_id: int) -> bool:
+        reporte = self.buscar_por_id(reporte_id)
         if reporte is None:
             return False
         db.session.delete(reporte)

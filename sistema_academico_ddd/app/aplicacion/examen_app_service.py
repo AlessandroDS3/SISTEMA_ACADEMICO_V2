@@ -95,8 +95,8 @@ class ExamenAppService:
         db.session.commit()
         return asignacion
 
-    def obtener_por_id(self, id: int) -> Optional[Examen]:
-        return self._repositorio.buscar_por_id(id)
+    def obtener_por_id(self, examen_id: int) -> Optional[Examen]:
+        return self._repositorio.buscar_por_id(examen_id)
 
     def listar_por_materia(self, materia_id: int) -> List[Examen]:
         return self._repositorio.buscar_por_materia(materia_id)
@@ -106,22 +106,22 @@ class ExamenAppService:
 
     def actualizar_examen(
         self,
-        id: int,
+        examen_id: int,
         titulo: str,
         materia_id: int,
         numero_preguntas: int,
         numero_alternativas: int = 4,
         puntaje_por_pregunta: float = 1.0,
     ) -> Examen:
-        examen = self._buscar_examen_existente(id)
+        examen = self._buscar_examen_existente(examen_id)
         self._aplicar_cambios_basicos(examen, titulo, materia_id, numero_preguntas)
         self._aplicar_cambios_configuracion(examen, numero_alternativas, puntaje_por_pregunta)
         return self._repositorio.actualizar(examen)
 
-    def _buscar_examen_existente(self, id: int) -> Examen:
-        examen = self._repositorio.buscar_por_id(id)
+    def _buscar_examen_existente(self, examen_id: int) -> Examen:
+        examen = self._repositorio.buscar_por_id(examen_id)
         if examen is None:
-            raise ExamenNoEncontradoError(id)
+            raise ExamenNoEncontradoError(examen_id)
         return examen
 
     def _aplicar_cambios_basicos(
@@ -138,5 +138,5 @@ class ExamenAppService:
             examen.configuracion.numero_alternativas = numero_alternativas
             examen.configuracion.puntaje_por_pregunta = puntaje_por_pregunta
 
-    def eliminar_examen(self, id: int) -> bool:
-        return self._repositorio.eliminar(id)
+    def eliminar_examen(self, examen_id: int) -> bool:
+        return self._repositorio.eliminar(examen_id)

@@ -12,7 +12,7 @@ class IPerfilAcademicoRepositorio(ABC):
         ...
 
     @abstractmethod
-    def buscar_por_id(self, id: int) -> Optional[PerfilAcademico]:
+    def buscar_por_id(self, perfil_id: int) -> Optional[PerfilAcademico]:
         ...
 
     @abstractmethod
@@ -24,7 +24,7 @@ class IPerfilAcademicoRepositorio(ABC):
         ...
 
     @abstractmethod
-    def eliminar(self, id: int) -> bool:
+    def eliminar(self, perfil_id: int) -> bool:
         ...
 
     @abstractmethod

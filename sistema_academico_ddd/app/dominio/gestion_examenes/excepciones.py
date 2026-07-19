@@ -9,9 +9,9 @@ class GestionExamenesError(ValueError):
 
 
 class ExamenNoEncontradoError(GestionExamenesError):
-    def __init__(self, id: int):
-        super().__init__(f"No existe un examen con id {id}")
-        self.id = id
+    def __init__(self, examen_id: int):
+        super().__init__(f"No existe un examen con id {examen_id}")
+        self.id = examen_id
 
 
 class NumeroPreguntasInvalidoError(GestionExamenesError):

@@ -40,10 +40,10 @@ def crear():
     return redirect(url_for("examen.listar"))
 
 
-@examen_bp.route("/<int:id>/editar", methods=["GET"])
-def editar(id: int):
+@examen_bp.route("/<int:examen_id>/editar", methods=["GET"])
+def editar(examen_id: int):
     servicio = examen_app_service()
-    examen = servicio.obtener_por_id(id)
+    examen = servicio.obtener_por_id(examen_id)
     if examen is None:
         flash("Examen no encontrado")
         return redirect(url_for("examen.listar"))
@@ -51,12 +51,12 @@ def editar(id: int):
     return render_template("examenes/editar.html", examen=examen, materias=materias)
 
 
-@examen_bp.route("/<int:id>/editar", methods=["POST"])
+@examen_bp.route("/<int:examen_id>/editar", methods=["POST"])
 @manejar_errores_de_dominio(_ir_al_listado)
-def actualizar(id: int):
+def actualizar(examen_id: int):
     servicio = examen_app_service()
     servicio.actualizar_examen(
-        id=id,
+        examen_id=examen_id,
         titulo=request.form["titulo"],
         materia_id=int(request.form["materia_id"]),
         numero_preguntas=int(request.form["numero_preguntas"]),
@@ -67,8 +67,8 @@ def actualizar(id: int):
     return redirect(url_for("examen.listar"))
 
 
-@examen_bp.route("/<int:id>/eliminar", methods=["POST"])
-def eliminar(id: int):
+@examen_bp.route("/<int:examen_id>/eliminar", methods=["POST"])
+def eliminar(examen_id: int):
     servicio = examen_app_service()
-    servicio.eliminar_examen(id)
+    servicio.eliminar_examen(examen_id)
     return redirect(url_for("examen.listar"))

@@ -21,9 +21,9 @@ class UsernameEnUsoError(UsuarioError):
 
 
 class UsuarioNoEncontradoError(UsuarioError):
-    def __init__(self, id: int):
-        super().__init__(f"No existe un usuario con id {id}")
-        self.id = id
+    def __init__(self, usuario_id: int):
+        super().__init__(f"No existe un usuario con id {usuario_id}")
+        self.id = usuario_id
 
 
 class PasswordInvalidoError(UsuarioError):

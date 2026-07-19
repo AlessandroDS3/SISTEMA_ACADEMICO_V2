@@ -4,7 +4,7 @@
 {% block contenido %}
 <h1>Editar examen #{{ examen.id }}</h1>
 
-<form class="formulario-simple" action="{{ url_for('examen.actualizar', id=examen.id) }}" method="post">
+<form class="formulario-simple" action="{{ url_for('examen.actualizar', examen_id=examen.id) }}" method="post">
     <div>
         <label for="titulo">Titulo</label>
         <input type="text" id="titulo" name="titulo" value="{{ examen.titulo }}" required>

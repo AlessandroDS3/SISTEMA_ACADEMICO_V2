@@ -98,8 +98,8 @@ class RespuestaEstudianteAppService:
         db.session.commit()
         return contexto
 
-    def obtener_por_id(self, id: int) -> Optional[RespuestaEstudiante]:
-        return self._respuesta_repositorio.buscar_por_id(id)
+    def obtener_por_id(self, respuesta_id: int) -> Optional[RespuestaEstudiante]:
+        return self._respuesta_repositorio.buscar_por_id(respuesta_id)
 
     def listar_por_examen(self, examen_id: int) -> List[RespuestaEstudiante]:
         return self._respuesta_repositorio.buscar_por_examen(examen_id)

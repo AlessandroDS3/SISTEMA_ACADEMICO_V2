@@ -15,8 +15,8 @@ class PerfilAcademicoRepositorioImpl(IPerfilAcademicoRepositorio):
         db.session.commit()
         return perfil
 
-    def buscar_por_id(self, id: int) -> Optional[PerfilAcademico]:
-        return db.session.get(PerfilAcademico, id)
+    def buscar_por_id(self, perfil_id: int) -> Optional[PerfilAcademico]:
+        return db.session.get(PerfilAcademico, perfil_id)
 
     def buscar_por_estudiante(self, estudiante_id: int) -> Optional[PerfilAcademico]:
         return db.session.query(PerfilAcademico).filter_by(estudiante_id=estudiante_id).first()
@@ -25,8 +25,8 @@ class PerfilAcademicoRepositorioImpl(IPerfilAcademicoRepositorio):
         db.session.commit()
         return perfil
 
-    def eliminar(self, id: int) -> bool:
-        perfil = self.buscar_por_id(id)
+    def eliminar(self, perfil_id: int) -> bool:
+        perfil = self.buscar_por_id(perfil_id)
         if perfil is None:
             return False
         db.session.delete(perfil)

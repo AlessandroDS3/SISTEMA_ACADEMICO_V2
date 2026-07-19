@@ -12,7 +12,7 @@ class IReporteInstitucionalRepositorio(ABC):
         ...
 
     @abstractmethod
-    def buscar_por_id(self, id: int) -> Optional[ReporteInstitucional]:
+    def buscar_por_id(self, reporte_id: int) -> Optional[ReporteInstitucional]:
         ...
 
     @abstractmethod
@@ -29,7 +29,7 @@ class IReporteInstitucionalRepositorio(ABC):
         ...
 
     @abstractmethod
-    def eliminar(self, id: int) -> bool:
+    def eliminar(self, reporte_id: int) -> bool:
         ...
 
     @abstractmethod

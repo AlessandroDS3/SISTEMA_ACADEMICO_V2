@@ -17,8 +17,8 @@ class UsuarioRepositorioImpl(IUsuarioRepositorio):
         db.session.commit()
         return usuario
 
-    def buscar_por_id(self, id: int) -> Optional[Usuario]:
-        return db.session.get(Usuario, id)
+    def buscar_por_id(self, usuario_id: int) -> Optional[Usuario]:
+        return db.session.get(Usuario, usuario_id)
 
     def buscar_por_username(self, username: str) -> Optional[Usuario]:
         return db.session.query(Usuario).filter_by(username=username).first()
@@ -27,8 +27,8 @@ class UsuarioRepositorioImpl(IUsuarioRepositorio):
         db.session.commit()
         return usuario
 
-    def eliminar(self, id: int) -> bool:
-        usuario = self.buscar_por_id(id)
+    def eliminar(self, usuario_id: int) -> bool:
+        usuario = self.buscar_por_id(usuario_id)
         if usuario is None:
             return False
         db.session.delete(usuario)

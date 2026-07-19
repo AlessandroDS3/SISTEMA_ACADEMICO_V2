@@ -52,8 +52,8 @@
             <td>{{ examen.materia.nombre if examen.materia else "-" }}</td>
             <td>{{ examen.numero_preguntas }}</td>
             <td>
-                <a href="{{ url_for('examen.editar', id=examen.id) }}">Editar</a>
-                <form action="{{ url_for('examen.eliminar', id=examen.id) }}" method="post">
+                <a href="{{ url_for('examen.editar', examen_id=examen.id) }}">Editar</a>
+                <form action="{{ url_for('examen.eliminar', examen_id=examen.id) }}" method="post">
                     <button type="submit">Eliminar</button>
                 </form>
             </td>

@@ -16,8 +16,8 @@ class ExamenRepositorioImpl(IExamenRepositorio):
         db.session.commit()
         return examen
 
-    def buscar_por_id(self, id: int) -> Optional[Examen]:
-        return db.session.get(Examen, id)
+    def buscar_por_id(self, examen_id: int) -> Optional[Examen]:
+        return db.session.get(Examen, examen_id)
 
     def buscar_por_materia(self, materia_id: int) -> List[Examen]:
         return db.session.query(Examen).filter_by(materia_id=materia_id).all()
@@ -26,8 +26,8 @@ class ExamenRepositorioImpl(IExamenRepositorio):
         db.session.commit()
         return examen
 
-    def eliminar(self, id: int) -> bool:
-        examen = self.buscar_por_id(id)
+    def eliminar(self, examen_id: int) -> bool:
+        examen = self.buscar_por_id(examen_id)
         if examen is None:
             return False
         db.session.delete(examen)

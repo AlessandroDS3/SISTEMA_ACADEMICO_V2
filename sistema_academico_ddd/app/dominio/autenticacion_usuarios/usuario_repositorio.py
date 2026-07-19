@@ -19,7 +19,7 @@ class IUsuarioRepositorio(ABC):
         ...
 
     @abstractmethod
-    def buscar_por_id(self, id: int) -> Optional[Usuario]:
+    def buscar_por_id(self, usuario_id: int) -> Optional[Usuario]:
         ...
 
     @abstractmethod
@@ -31,7 +31,7 @@ class IUsuarioRepositorio(ABC):
         ...
 
     @abstractmethod
-    def eliminar(self, id: int) -> bool:
+    def eliminar(self, usuario_id: int) -> bool:
         ...
 
     @abstractmethod

@@ -33,21 +33,21 @@ class UsuarioAppService:
             return usuario
         return None
 
-    def obtener_por_id(self, id: int) -> Optional[Usuario]:
-        return self._repositorio.buscar_por_id(id)
+    def obtener_por_id(self, usuario_id: int) -> Optional[Usuario]:
+        return self._repositorio.buscar_por_id(usuario_id)
 
     def listar_usuarios(self) -> List[Usuario]:
         return self._repositorio.listar()
 
     def actualizar_usuario(
-        self, id: int, username: str, rol: RolEnum, password: Optional[str] = None
+        self, usuario_id: int, username: str, rol: RolEnum, password: Optional[str] = None
     ) -> Usuario:
-        usuario = self._repositorio.buscar_por_id(id)
+        usuario = self._repositorio.buscar_por_id(usuario_id)
         if usuario is None:
-            raise UsuarioNoEncontradoError(id)
+            raise UsuarioNoEncontradoError(usuario_id)
 
         existente = self._repositorio.buscar_por_username(username)
-        if existente is not None and existente.id != id:
+        if existente is not None and existente.id != usuario_id:
             raise UsernameEnUsoError(username)
 
         usuario.actualizar_perfil(username, rol)
@@ -55,5 +55,5 @@ class UsuarioAppService:
             usuario.establecer_password(password)
         return self._repositorio.actualizar(usuario)
 
-    def eliminar_usuario(self, id: int) -> bool:
-        return self._repositorio.eliminar(id)
+    def eliminar_usuario(self, usuario_id: int) -> bool:
+        return self._repositorio.eliminar(usuario_id)

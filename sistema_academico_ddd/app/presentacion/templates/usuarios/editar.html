@@ -4,7 +4,7 @@
 {% block contenido %}
 <h1>Editar usuario #{{ usuario.id }}</h1>
 
-<form class="formulario-simple" action="{{ url_for('usuario.actualizar', id=usuario.id) }}" method="post">
+<form class="formulario-simple" action="{{ url_for('usuario.actualizar', usuario_id=usuario.id) }}" method="post">
     <div>
         <label for="username">Username</label>
         <input type="text" id="username" name="username" value="{{ usuario.username }}" required>

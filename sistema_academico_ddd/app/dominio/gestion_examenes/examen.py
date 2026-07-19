@@ -4,7 +4,6 @@ Gestion_de_Examenes).
 from datetime import datetime
 
 from app.extensions import db
-from app.dominio.area_materia.materia import Materia  # noqa: F401 (relacion)
 from app.dominio.gestion_examenes.excepciones import PreguntaDuplicadaError
 from app.dominio.gestion_examenes.pregunta_banco import PreguntaBanco
 

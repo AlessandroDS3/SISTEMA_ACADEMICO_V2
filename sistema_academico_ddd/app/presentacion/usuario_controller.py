@@ -35,22 +35,22 @@ def crear():
     return redirect(url_for("usuario.listar"))
 
 
-@usuario_bp.route("/<int:id>/editar", methods=["GET"])
-def editar(id: int):
+@usuario_bp.route("/<int:usuario_id>/editar", methods=["GET"])
+def editar(usuario_id: int):
     servicio = usuario_app_service()
-    usuario = servicio.obtener_por_id(id)
+    usuario = servicio.obtener_por_id(usuario_id)
     if usuario is None:
         flash("Usuario no encontrado")
         return redirect(url_for("usuario.listar"))
     return render_template("usuarios/editar.html", usuario=usuario, roles=RolEnum)
 
 
-@usuario_bp.route("/<int:id>/editar", methods=["POST"])
+@usuario_bp.route("/<int:usuario_id>/editar", methods=["POST"])
 @manejar_errores_de_dominio(_ir_al_listado)
-def actualizar(id: int):
+def actualizar(usuario_id: int):
     servicio = usuario_app_service()
     servicio.actualizar_usuario(
-        id=id,
+        usuario_id=usuario_id,
         username=request.form["username"],
         rol=RolEnum(request.form.get("rol", RolEnum.ESTUDIANTE.value)),
         password=request.form.get("password") or None,
@@ -59,8 +59,8 @@ def actualizar(id: int):
     return redirect(url_for("usuario.listar"))
 
 
-@usuario_bp.route("/<int:id>/eliminar", methods=["POST"])
-def eliminar(id: int):
+@usuario_bp.route("/<int:usuario_id>/eliminar", methods=["POST"])
+def eliminar(usuario_id: int):
     servicio = usuario_app_service()
-    servicio.eliminar_usuario(id)
+    servicio.eliminar_usuario(usuario_id)
     return redirect(url_for("usuario.listar"))

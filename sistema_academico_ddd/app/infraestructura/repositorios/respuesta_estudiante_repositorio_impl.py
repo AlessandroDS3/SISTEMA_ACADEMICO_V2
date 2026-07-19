@@ -18,8 +18,8 @@ class RespuestaEstudianteRepositorioImpl(IRespuestaEstudianteRepositorio):
         db.session.commit()
         return respuesta
 
-    def buscar_por_id(self, id: int) -> Optional[RespuestaEstudiante]:
-        return db.session.get(RespuestaEstudiante, id)
+    def buscar_por_id(self, respuesta_id: int) -> Optional[RespuestaEstudiante]:
+        return db.session.get(RespuestaEstudiante, respuesta_id)
 
     def buscar_por_examen(self, examen_id: int) -> List[RespuestaEstudiante]:
         return db.session.query(RespuestaEstudiante).filter_by(examen_id=examen_id).all()
@@ -31,8 +31,8 @@ class RespuestaEstudianteRepositorioImpl(IRespuestaEstudianteRepositorio):
         db.session.commit()
         return respuesta
 
-    def eliminar(self, id: int) -> bool:
-        respuesta = self.buscar_por_id(id)
+    def eliminar(self, respuesta_id: int) -> bool:
+        respuesta = self.buscar_por_id(respuesta_id)
         if respuesta is None:
             return False
         db.session.delete(respuesta)

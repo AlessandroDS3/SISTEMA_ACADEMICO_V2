@@ -17,7 +17,7 @@ class IRespuestaEstudianteRepositorio(ABC):
         ...
 
     @abstractmethod
-    def buscar_por_id(self, id: int) -> Optional[RespuestaEstudiante]:
+    def buscar_por_id(self, respuesta_id: int) -> Optional[RespuestaEstudiante]:
         ...
 
     @abstractmethod
@@ -33,7 +33,7 @@ class IRespuestaEstudianteRepositorio(ABC):
         ...
 
     @abstractmethod
-    def eliminar(self, id: int) -> bool:
+    def eliminar(self, respuesta_id: int) -> bool:
         ...
 
     @abstractmethod

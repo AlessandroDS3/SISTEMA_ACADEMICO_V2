@@ -11,8 +11,8 @@ libreria de vision por computadora) segun DDD.
 Estilos de programacion ya presentes en este subdominio (no hace falta
 reescribirlos, se documentan con su fragmento real en el README):
   - Pipeline: `identificacion.py` encadena
-    `load_and_preprocess_image -> extract_id_section ->
-    detect_filled_bubbles_in_dni`, cada funcion tomando la salida de la
+    `cargar_y_preprocesar_imagen -> extraer_seccion_identificacion ->
+    detectar_burbujas_llenas_dni`, cada funcion tomando la salida de la
     anterior.
   - Things: `ProcesadorExamenOMR` (`hoja_respuestas.py`) es un objeto
     con estado propio (umbrales, radios de busqueda) y comportamiento
@@ -29,7 +29,7 @@ from typing import Dict, List, Tuple
 
 from app.infraestructura.procesamiento_imagen.document_scanner import ProcesadorDocumentos
 from app.infraestructura.procesamiento_imagen.corner_detector import detectar_con_respaldo
-from app.infraestructura.procesamiento_imagen.identificacion import process_answer_sheet
+from app.infraestructura.procesamiento_imagen.identificacion import procesar_hoja_respuestas
 from app.infraestructura.procesamiento_imagen.hoja_respuestas import ProcesadorExamenOMR
 from app.infraestructura.procesamiento_imagen.excepciones import ImagenNoEncontradaError
 
@@ -69,7 +69,7 @@ class ProcesadorImagenServicio:
     def identificar_estudiante(self, ruta_imagen_corregida: str) -> Tuple[List[int], str]:
         """Extrae el codigo del estudiante (burbujas de DNI/codigo) y el
         area de aplicacion marcada en la hoja."""
-        return process_answer_sheet(ruta_imagen_corregida)
+        return procesar_hoja_respuestas(ruta_imagen_corregida)
 
     def extraer_respuestas_marcadas(self, ruta_imagen_corregida: str) -> Dict[str, str]:
         """Detecta las alternativas marcadas (A/B/C/D) pregunta por

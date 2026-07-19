@@ -12,7 +12,7 @@ class IExamenRepositorio(ABC):
         ...
 
     @abstractmethod
-    def buscar_por_id(self, id: int) -> Optional[Examen]:
+    def buscar_por_id(self, examen_id: int) -> Optional[Examen]:
         ...
 
     @abstractmethod
@@ -24,7 +24,7 @@ class IExamenRepositorio(ABC):
         ...
 
     @abstractmethod
-    def eliminar(self, id: int) -> bool:
+    def eliminar(self, examen_id: int) -> bool:
         ...
 
     @abstractmethod
