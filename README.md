@@ -107,7 +107,10 @@ dominio, factories e interfaces de repositorio), generado desde el modelo UML:
 
 ![Diagrama de clases](docs/uml/Class%20Diagram%20by%20Mermaid.png)
 
-El modelo UML original (StarUML) esta en [`docs/uml/ISUML.mdj`](docs/uml/ISUML.mdj).
+Los modelos UML originales (StarUML) estan en
+[`docs/uml/ISUML.mdj`](docs/uml/ISUML.mdj) (clases y casos de uso) y
+[`docs/uml/arquitectura_sistema_academico.mdj`](docs/uml/arquitectura_sistema_academico.mdj)
+(vista de arquitectura).
 
 ## Vista General de Arquitectura: Diagrama de Paquetes + Clases
 
