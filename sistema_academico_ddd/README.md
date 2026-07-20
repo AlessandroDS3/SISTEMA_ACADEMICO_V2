@@ -695,6 +695,83 @@ def ahora_utc() -> datetime:
 - **Formato**: ninguna linea supera los 100 caracteres fuera del modulo
   OMR heredado.
 
+## Principios SOLID
+
+Trabajo individual (Lab 12): se aplicaron **4 principios SOLID** sobre
+`seguimiento_academico`, uno de ellos (ISP) fue una violacion real
+detectada y corregida; los otros tres ya estaban bien aplicados en el
+diseño existente y se documentan con su fragmento correspondiente.
+
+### 1. ISP (Interface Segregation) — corregido
+
+`IPerfilAcademicoRepositorio` tenia 6 metodos, pero
+`PerfilAcademicoAppService` (su unico consumidor) solo invoca 3
+(`guardar`, `buscar_por_estudiante`, `listar`). Nadie llamaba a
+`buscar_por_id`, `actualizar` ni `eliminar` desde ningun caso de uso: el
+contrato obligaba a depender de operaciones que no se usaban. Se separo
+en dos interfaces
+([perfil_academico_repositorio.py](app/dominio/seguimiento_academico/perfil_academico_repositorio.py)):
+
+```python
+class IPerfilAcademicoRepositorio(ABC):
+    """Operaciones que consume el caso de uso de seguimiento academico."""
+    def guardar(self, perfil): ...
+    def buscar_por_estudiante(self, estudiante_id): ...
+    def listar(self): ...
+
+
+class IPerfilAcademicoMantenimiento(ABC):
+    """Operaciones administrativas que ningun caso de uso actual invoca."""
+    def buscar_por_id(self, perfil_id): ...
+    def actualizar(self, perfil): ...
+    def eliminar(self, perfil_id): ...
+```
+
+`PerfilAcademicoRepositorioImpl` implementa ambas (una sola clase
+concreta puede satisfacer varios contratos pequeños); pero
+`PerfilAcademicoAppService` solo declara una dependencia sobre la
+interfaz reducida.
+
+### 2. DIP (Dependency Inversion) — ya aplicado
+
+`PerfilAcademicoAppService` depende de la abstraccion
+`IPerfilAcademicoRepositorio`, nunca de `PerfilAcademicoRepositorioImpl`;
+la unica clase que conoce la implementacion concreta es el contenedor de
+dependencias (composition root)
+([contenedor.py](app/contenedor.py)):
+
+```python
+class PerfilAcademicoAppService:
+    def __init__(self, perfil_repositorio: IPerfilAcademicoRepositorio, ...):
+        self._perfil_repositorio = perfil_repositorio
+
+# contenedor.py — unico lugar que ata la abstraccion a lo concreto
+def perfil_academico_app_service() -> PerfilAcademicoAppService:
+    return PerfilAcademicoAppService(
+        PerfilAcademicoRepositorioImpl(), RespuestaEstudianteRepositorioImpl()
+    )
+```
+
+### 3. SRP (Single Responsibility) — ya aplicado
+
+El estilo Trinity de `evolucion_academica.py` separa el recalculo del
+promedio en tres clases, cada una con una unica razon de cambio:
+
+```python
+class EvolucionAcademicaEstado:   # solo guarda el estado
+class EvolucionAcademicaLector:   # solo lee y deriva
+class EvolucionAcademicaEscritor: # solo escribe
+```
+
+### 4. OCP (Open/Closed) — ya aplicado
+
+Como `PerfilAcademicoAppService` solo conoce la interfaz, se puede
+agregar una implementacion nueva del repositorio (por ejemplo, una en
+memoria para pruebas rapidas) sin modificar el servicio de aplicacion:
+basta con que la nueva clase implemente `IPerfilAcademicoRepositorio` y
+se registre en `contenedor.py`. El servicio queda **cerrado a
+modificacion, abierto a extension**.
+
 ## Tablero Kanban / Scrum
 
 El tablero de seguimiento del proyecto (User Story Mapping) está en Trello: *https://trello.com/b/HcmsG7VW*. Organizado en 8 listas por actividad (backbone del mapa) — Autenticación y Usuarios, Gestión de Exámenes, Banco de Preguntas, Calificación Automática, Rankings, Seguimiento Académico, Reportes y Estadísticas, No Funcionales — con las tarjetas de cada lista ordenadas por prioridad (MVP / Release 2 / Release 3) y etiquetadas por rol.

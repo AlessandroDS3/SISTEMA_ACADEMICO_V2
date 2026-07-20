@@ -157,6 +157,22 @@ categoria:
 Detalle con fragmentos antes/despues en
 **[`sistema_academico_ddd/README.md`](sistema_academico_ddd/README.md#practicas-clean-code)**.
 
+## Principios SOLID
+
+Sobre `seguimiento_academico` se aplicaron 4 principios SOLID; **ISP fue
+una violacion real corregida**, los otros tres ya estaban bien aplicados
+en el diseño y se documentan con su fragmento.
+
+| Principio | Estado | Que se hizo |
+|---|---|---|
+| ISP | Corregido | `IPerfilAcademicoRepositorio` (6 metodos) dividida en la interfaz que consume el caso de uso (3 metodos) + `IPerfilAcademicoMantenimiento` (operaciones sin consumidor real) |
+| DIP | Ya aplicado | El servicio depende de la interfaz, no de `PerfilAcademicoRepositorioImpl`; `contenedor.py` es el unico composition root |
+| SRP | Ya aplicado | Trinity (`Estado`/`Lector`/`Escritor`) en `evolucion_academica.py`, una responsabilidad por clase |
+| OCP | Ya aplicado | Nuevas implementaciones del repositorio se pueden agregar sin tocar `PerfilAcademicoAppService` |
+
+Detalle con fragmentos antes/despues en
+**[`sistema_academico_ddd/README.md`](sistema_academico_ddd/README.md#principios-solid)**.
+
 ## Tablero de Gestion (Trello)
 
 Tablero Kanban/Scrum con la plantilla **User Story Mapping**:
